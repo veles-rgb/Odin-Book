@@ -1,5 +1,8 @@
 const router = require("express").Router();
 
+// Routers
+const authRouter = require('./auth');
+
 router.get('/health', async (req, res) => {
     const healthCheck = {
         uptime: process.uptime(),
@@ -14,5 +17,7 @@ router.get('/health', async (req, res) => {
         res.status(503).json(healthCheck);
     }
 });
+
+router.use('/auth', authRouter);
 
 module.exports = router;
