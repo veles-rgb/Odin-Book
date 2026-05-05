@@ -6,3 +6,14 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  first_name String @db.VarChar(20)
+  last_name String @db.VarChar(40)
+  username String @unique /// @constraint: Alphanumeric and underscores only (Applied via SQL migration)
+  hashed_password String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  profile_picture_url String?
+}
