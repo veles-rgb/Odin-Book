@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { authenticateToken } = require('../middleware/authenticateToken');
 
 // Routers
 const authRouter = require('./auth');
