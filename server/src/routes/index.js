@@ -19,6 +19,10 @@ router.get('/health', async (req, res) => {
     }
 });
 
+router.get('/check', authenticateToken, (req, res) => {
+    res.status(200).json({ message: "You are auth'd" });
+});
+
 router.use('/auth', authRouter);
 
 module.exports = router;
