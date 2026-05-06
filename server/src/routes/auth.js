@@ -4,5 +4,6 @@ const controller = require('../controllers/auth');
 // get /verify (requireAuth)
 router.post('/register', controller.registerUser);
 router.post('/login', controller.loginUser);
+router.post('/token', controller.createAccessToken);
 
 module.exports = router;
