@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id                  String         @id @default(uuid()) @db.Uuid
-  first_name          String         @db.VarChar(20)
-  last_name           String         @db.VarChar(40)
-  username            String         @unique /// @constraint: Alphanumeric and underscores only (Applied via SQL migration)
+  id                  String   @id @default(uuid()) @db.Uuid
+  first_name          String   @db.VarChar(20)
+  last_name           String   @db.VarChar(40)
+  username            String   @unique /// @constraint: Alphanumeric and underscores only (Applied via SQL migration)
   hashed_password     String
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
   profile_picture_url String?
 
-  refreshTokens       RefreshToken[]
+  refreshTokens RefreshToken[]
+  posts         Post[]
 }
 
 model RefreshToken {
@@ -29,4 +30,13 @@ model RefreshToken {
   created_at DateTime @default(now())
 
   @@map("refreshToken")
+}
+
+model Post {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
