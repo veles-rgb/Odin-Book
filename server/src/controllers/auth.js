@@ -9,7 +9,7 @@ function generateAccessToken(user) {
             sub: user.id,
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '15s' }
+        { expiresIn: '15m' }
     );
 }
 
@@ -143,7 +143,7 @@ async function createAccessToken(req, res, next) {
         const accessToken = jwt.sign(
             { sub: payload.sub },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15s' }
+            { expiresIn: '15m' }
         );
 
         return res.json({ accessToken });
