@@ -4,6 +4,7 @@ const { authenticateToken } = require('../middleware/authenticateToken');
 // Routers
 const authRouter = require('./auth');
 const userRouter = require('./user');
+const postRouter = require('./post');
 
 router.get('/health', async (req, res) => {
     const healthCheck = {
@@ -23,5 +24,7 @@ router.get('/health', async (req, res) => {
 router.use('/auth', authRouter);
 
 router.use('/user', authenticateToken, userRouter);
+
+router.use('/post', authenticateToken, postRouter);
 
 module.exports = router;
