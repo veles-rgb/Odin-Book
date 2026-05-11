@@ -70,7 +70,6 @@ async function editPost(req, res, next) {
         const updatedPost = await prisma.post.update({
             where: {
                 id: post.id,
-                user_id: user.id,
             },
             data: {
                 content: trimmedContent
@@ -83,7 +82,36 @@ async function editPost(req, res, next) {
     }
 }
 
+async function deletePost(req, res, next) {
+    try {
+        const user = req.user;
+        const { id } = req.params;
+
+        if (!isUUID(id)) return res.status(400).json({ error: "Invalid Post ID" });
+
+        const post = await prisma.post.findFirst({
+            where: {
+                id,
+                user_id: user.id
+            }
+        });
+
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const deletedPost = await prisma.post.delete({
+            where: {
+                id,
+            },
+        });
+
+        return res.status(200).json({ deletedPost });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     createPost,
     editPost,
+    deletePost,
 };
