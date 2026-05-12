@@ -77,6 +77,7 @@ async function editComment(req, res, next) {
             },
             select: {
                 id: true,
+                parent_id: true,
                 post_id: true,
                 user_id: true,
                 content: true,
@@ -100,7 +101,36 @@ async function editComment(req, res, next) {
     }
 }
 
+async function deleteComment(req, res, next) {
+    try {
+        const user = req.user;
+        const { id } = req.params;
+
+        if (!isUUID(id)) return res.status(400).json({ error: "Invalid comment ID." });
+
+        const comment = await prisma.comment.findFirst({
+            where: {
+                id,
+                user_id: user.id,
+            },
+        });
+
+        if (!comment) return res.status(404).json({ error: "Comment not found." });
+
+        const deletedComment = await prisma.comment.delete({
+            where: {
+                id,
+            },
+        });
+
+        return res.status(200).json({ deletedComment });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     createComment,
     editComment,
+    deleteComment,
 };
