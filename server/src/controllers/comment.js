@@ -207,9 +207,67 @@ async function createReplyComment(req, res, next) {
     }
 }
 
+async function getCommentById(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid comment ID." });
+        }
+
+        const comment = await prisma.comment.findFirst({
+            where: {
+                id,
+            },
+            select: {
+                id: true,
+                parent_id: true,
+                post_id: true,
+                content: true,
+                user: {
+                    select: {
+                        id: true,
+                        first_name: true,
+                        last_name: true,
+                        username: true,
+                        profile_picture_url: true,
+                    },
+                },
+                comments: {
+                    select: {
+                        id: true,
+                        parent_id: true,
+                        post_id: true,
+                        content: true,
+                        user: {
+                            select: {
+                                id: true,
+                                first_name: true,
+                                last_name: true,
+                                username: true,
+                                profile_picture_url: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!comment) {
+            return res.status(400).json({ error: "Comment not found." });
+        }
+
+        return res.status(200).json({ comment });
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     createComment,
     editComment,
     deleteComment,
     createReplyComment,
+    getCommentById,
 };
