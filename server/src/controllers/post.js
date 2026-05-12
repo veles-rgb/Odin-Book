@@ -59,6 +59,7 @@ async function editPost(req, res, next) {
                         first_name: true,
                         last_name: true,
                         created_at: true,
+                        profile_picture_url: true,
                     },
                 },
             },
