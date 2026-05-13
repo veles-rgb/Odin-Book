@@ -264,10 +264,38 @@ async function getCommentById(req, res, next) {
     }
 }
 
+async function getPostComments(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        if (!isUUID(id)) return res.status(400).json({ error: "Invalid post ID." });
+
+        const post = await prisma.post.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        if (!post) return res.status(404).json({ error: "Post not found." });
+
+        const comments = await prisma.comment.findMany({
+            where: {
+                post_id: id,
+            }
+        });
+
+        return res.status(200).json({ comments });
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     createComment,
     editComment,
     deleteComment,
     createReplyComment,
     getCommentById,
+    getPostComments,
 };
