@@ -6,6 +6,7 @@ const authRouter = require('./auth');
 const userRouter = require('./user');
 const postRouter = require('./post');
 const commentRouter = require('./comment');
+const likeRouter = require('./like');
 
 router.get('/health', async (req, res) => {
     const healthCheck = {
@@ -29,5 +30,7 @@ router.use('/user', authenticateToken, userRouter);
 router.use('/post', authenticateToken, postRouter);
 
 router.use('/comment', authenticateToken, commentRouter);
+
+router.use('/like', authenticateToken, likeRouter);
 
 module.exports = router;
