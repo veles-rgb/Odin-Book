@@ -20,6 +20,7 @@ model User {
   refreshTokens RefreshToken[]
   posts         Post[]
   comments      Comment[]
+  postLikes     postLike[]
 }
 
 model RefreshToken {
@@ -41,7 +42,8 @@ model Post {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  comments Comment[]
+  comments  Comment[]
+  postLikes postLike[]
 }
 
 model Comment {
@@ -57,4 +59,16 @@ model Comment {
   updated_at DateTime @updatedAt
 
   comments Comment[] @relation("CommentToComment")
+}
+
+model postLike {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  post_id    String   @db.Uuid
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, post_id])
 }
