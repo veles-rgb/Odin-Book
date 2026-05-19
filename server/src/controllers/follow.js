@@ -56,8 +56,46 @@ async function sendFollowRequest(req, res, next) {
     }
 }
 
+async function cancelFollowRequest(req, res, next) {
+    try {
+        const user = req.user;
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({
+                error: "Invalid user ID.",
+            });
+        }
+
+        const followRequest = await prisma.followRequest.findFirst({
+            where: {
+                requester_id: user.id,
+                receiver_id: id,
+            },
+        });
+
+        if (!followRequest) {
+            return res.status(404).json({
+                error: "That follow request does not exist.",
+            });
+        }
+
+        await prisma.followRequest.delete({
+            where: {
+                id: followRequest.id,
+            },
+        });
+
+        return res.status(200).json({
+            message: "Follow request cancelled.",
+        });
+
+    } catch (error) {
+        return next(error);
+    }
+}
 
 module.exports = {
     sendFollowRequest,
-
+    cancelFollowRequest,
 };
