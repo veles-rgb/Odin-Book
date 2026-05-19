@@ -22,6 +22,9 @@ model User {
   comments      Comment[]
   postLikes     postLike[]
   commentLikes  commentLike[]
+
+  followers Follow[] @relation("UserFollowers")
+  following Follow[] @relation("UserFollowing")
 }
 
 model RefreshToken {
@@ -85,4 +88,16 @@ model commentLike {
   comment Comment @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, comment_id])
+}
+
+model Follow {
+  id           String   @id @default(uuid()) @db.Uuid
+  follower_id  String   @db.Uuid
+  following_id String   @db.Uuid
+  created_at   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [follower_id], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [following_id], references: [id], onDelete: Cascade)
+
+  @@unique([follower_id, following_id])
 }
