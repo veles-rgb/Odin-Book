@@ -2,7 +2,7 @@ const router = require('express').Router();
 const controller = require('../controllers/follow');
 
 router.post('/:id/request', controller.sendFollowRequest); // sendFollowRequest
-// router.delete('/:id/request'); // cancelFollowRequest
+router.delete('/:id/request', controller.cancelFollowRequest); // cancelFollowRequest
 
 // router.post('/requests/:id/accept'); // acceptFollowRequest
 // router.delete('/requests/:id/reject'); // rejectFollowRequest
