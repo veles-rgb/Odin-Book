@@ -192,13 +192,72 @@ async function getReceivedFollowRequests(req, res, next) {
     try {
         const user = req.user;
 
-        const ReceivedFollowRequests = await prisma.followRequest.findMany({
+        const receivedFollowRequests = await prisma.followRequest.findMany({
             where: {
-                receiver_id: user.id
+                receiver_id: user.id,
+            },
+
+            orderBy: {
+                created_at: "desc",
+            },
+
+            select: {
+                id: true,
+                created_at: true,
+
+                requester: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
             },
         });
 
-        return res.status(200).json({ ReceivedFollowRequests });
+        return res.status(200).json({
+            received_follow_requests: receivedFollowRequests,
+        });
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function getSentFollowRequests(req, res, next) {
+    try {
+        const user = req.user;
+
+        const sentFollowRequests = await prisma.followRequest.findMany({
+            where: {
+                requester_id: user.id,
+            },
+
+            orderBy: {
+                created_at: "desc",
+            },
+
+            select: {
+                id: true,
+                created_at: true,
+
+                receiver: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
+            },
+        });
+
+        return res.status(200).json({
+            sent_follow_requests: sentFollowRequests,
+        });
 
     } catch (error) {
         return next(error);
@@ -213,4 +272,5 @@ module.exports = {
     rejectFollowRequest,
 
     getReceivedFollowRequests,
+    getSentFollowRequests,
 };
