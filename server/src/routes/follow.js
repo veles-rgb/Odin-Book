@@ -8,9 +8,10 @@ router.post('/requests/:id/accept', controller.acceptFollowRequest); // acceptFo
 router.delete('/requests/:id/reject', controller.rejectFollowRequest); // rejectFollowRequest
 
 router.get('/requests/received', controller.getReceivedFollowRequests); // getReceivedFollowRequests
-// router.get('/requests/sent'); // getSentFollowRequests
+router.get('/requests/sent', controller.getSentFollowRequests); // getSentFollowRequests
 
 // router.delete('/:id'); // unfollowUser
+// router.delete('/:id/follower'); // removeFollower
 
 // router.get('/:id/followers'); // getFollowers
 // router.get('/:id/following'); // getFollowing
