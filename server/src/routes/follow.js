@@ -4,8 +4,8 @@ const controller = require('../controllers/follow');
 router.post('/:id/request', controller.sendFollowRequest); // sendFollowRequest
 router.delete('/:id/request', controller.cancelFollowRequest); // cancelFollowRequest
 
-// router.post('/requests/:id/accept'); // acceptFollowRequest
-// router.delete('/requests/:id/reject'); // rejectFollowRequest
+router.post('/requests/:id/accept', controller.acceptFollowRequest); // acceptFollowRequest
+router.delete('/requests/:id/reject', controller.rejectFollowRequest); // rejectFollowRequest
 
 // router.get('/requests/received'); // getReceivedFollowRequests
 // router.get('/requests/sent'); // getSentFollowRequests
