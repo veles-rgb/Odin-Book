@@ -188,10 +188,29 @@ async function rejectFollowRequest(req, res, next) {
     }
 }
 
+async function getReceivedFollowRequests(req, res, next) {
+    try {
+        const user = req.user;
+
+        const ReceivedFollowRequests = await prisma.followRequest.findMany({
+            where: {
+                receiver_id: user.id
+            },
+        });
+
+        return res.status(200).json({ ReceivedFollowRequests });
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     sendFollowRequest,
     cancelFollowRequest,
 
     acceptFollowRequest,
     rejectFollowRequest,
+
+    getReceivedFollowRequests,
 };
