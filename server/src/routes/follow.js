@@ -7,7 +7,7 @@ router.delete('/:id/request', controller.cancelFollowRequest); // cancelFollowRe
 router.post('/requests/:id/accept', controller.acceptFollowRequest); // acceptFollowRequest
 router.delete('/requests/:id/reject', controller.rejectFollowRequest); // rejectFollowRequest
 
-// router.get('/requests/received'); // getReceivedFollowRequests
+router.get('/requests/received', controller.getReceivedFollowRequests); // getReceivedFollowRequests
 // router.get('/requests/sent'); // getSentFollowRequests
 
 // router.delete('/:id'); // unfollowUser
