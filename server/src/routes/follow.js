@@ -13,7 +13,7 @@ router.get('/requests/sent', controller.getSentFollowRequests); // getSentFollow
 router.delete('/:id', controller.unfollowUser); // unfollowUser
 router.delete('/:id/follower', controller.removeFollower); // removeFollower
 
-// router.get('/:id/followers'); // getFollowers
-// router.get('/:id/following'); // getFollowing
+router.get('/:id/followers', controller.getFollowers); // getFollowers
+router.get('/:id/following', controller.getFollowing); // getFollowing
 
 module.exports = router;
