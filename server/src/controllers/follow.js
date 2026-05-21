@@ -264,6 +264,70 @@ async function getSentFollowRequests(req, res, next) {
     }
 }
 
+async function unfollowUser(req, res, next) {
+    try {
+        const user = req.user;
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid user ID." });
+        }
+
+        const follow = await prisma.follow.findFirst({
+            where: {
+                follower_id: user.id,
+                following_id: id,
+            },
+        });
+
+        if (!follow) {
+            return res.status(404).json({ error: "You are not following this user." });
+        }
+
+        await prisma.follow.delete({
+            where: {
+                id: follow.id,
+            },
+        });
+
+        return res.status(200).json({ message: "Unfollowed successfully." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function removeFollower(req, res, next) {
+    try {
+        const user = req.user;
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid user ID." });
+        }
+
+        const follow = await prisma.follow.findFirst({
+            where: {
+                following_id: user.id,
+                follower_id: id,
+            },
+        });
+
+        if (!follow) {
+            return res.status(404).json({ message: "That user is not following you." });
+        }
+
+        await prisma.follow.delete({
+            where: {
+                id: follow.id,
+            },
+        });
+
+        return res.status(200).json({ message: "Removed follower." });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     sendFollowRequest,
     cancelFollowRequest,
@@ -273,4 +337,7 @@ module.exports = {
 
     getReceivedFollowRequests,
     getSentFollowRequests,
+
+    unfollowUser,
+    removeFollower,
 };
