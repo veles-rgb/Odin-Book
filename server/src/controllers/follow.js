@@ -328,6 +328,66 @@ async function removeFollower(req, res, next) {
     }
 }
 
+async function getFollowers(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid user ID." });
+        }
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "That user does not exist." });
+        }
+
+        const followers = await prisma.follow.findMany({
+            where: {
+                following_id: user.id,
+            },
+        });
+
+        return res.status(200).json({ followers });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+async function getFollowing(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid user ID." });
+        }
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "That user does not exist." });
+        }
+
+        const following = await prisma.follow.findMany({
+            where: {
+                follower_id: user.id,
+            },
+        });
+
+        return res.status(200).json({ following });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     sendFollowRequest,
     cancelFollowRequest,
@@ -340,4 +400,7 @@ module.exports = {
 
     unfollowUser,
     removeFollower,
+
+    getFollowers,
+    getFollowing
 };
