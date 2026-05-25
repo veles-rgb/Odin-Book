@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRegister } from '../hooks/useRegister';
 
 const Register = () => {
   const [firstName, setFirstName] = useState('');
@@ -6,10 +7,12 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const { register, error, isLoading } = useRegister();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(firstName, lastName, username, password, confirmPassword);
+
+    await register(firstName, lastName, username, password);
   };
 
   return (
@@ -55,7 +58,10 @@ const Register = () => {
         value={confirmPassword}
       />
 
-      <button type="submit">Register</button>
+      <button type="submit" disabled={isLoading}>
+        Register
+      </button>
+      {error && <div className="error">{error}</div>}
     </form>
   );
 };
