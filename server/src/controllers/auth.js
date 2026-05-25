@@ -67,7 +67,6 @@ async function registerUser(req, res, next) {
         });
 
         return res.status(201).json({
-            message: 'Registration successful',
             accessToken,
             user: {
                 id: user.id,
