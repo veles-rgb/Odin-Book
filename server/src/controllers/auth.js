@@ -41,14 +41,41 @@ async function registerUser(req, res, next) {
                 last_name: trimmedLast,
                 username: trimmedUsername,
                 hashed_password: hashedPassword,
-            }
+            },
         });
 
-        return res.status(201).json({ message: 'Registration successful' });
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        await prisma.refreshToken.create({
+            data: {
+                token_hash: hashedRefreshToken,
+                user_id: user.id,
+                expires_at: expiresAt,
+            },
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/api/auth",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(201).json({
+            message: 'Registration successful',
+            accessToken,
+        });
+
     } catch (error) {
         if (error.code === "P2002") {
             return res.status(409).json({ error: 'Username already taken' });
         }
+
         return next(error);
     }
 }
@@ -81,8 +108,8 @@ async function loginUser(req, res, next) {
             data: {
                 token_hash: hashedRefreshToken,
                 user_id: user.id,
-                expires_at: expiresAt
-            }
+                expires_at: expiresAt,
+            },
         });
 
         res.cookie("refreshToken", refreshToken, {
@@ -90,10 +117,10 @@ async function loginUser(req, res, next) {
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             path: "/api/auth",
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        return res.json({ accessToken: accessToken });
+        return res.json({ accessToken });
 
     } catch (error) {
         return next(error);
@@ -106,24 +133,24 @@ async function createAccessToken(req, res, next) {
 
         if (!refreshToken) return res.status(401).json({ error: 'Refresh token required' });
 
-        // 1. verify refresh token
         const payload = jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET
         );
 
-        // 2. check it against DB
-        const storedToken = await prisma.refreshToken.findMany({
+        const storedTokens = await prisma.refreshToken.findMany({
             where: {
-                user_id: payload.sub
-            }
+                user_id: payload.sub,
+            },
         });
 
-        if (!storedToken) return res.status(403).json({ error: "Invalid refresh token" });
+        if (storedTokens.length === 0) {
+            return res.status(403).json({ error: "Invalid refresh token" });
+        }
 
         let validToken = null;
 
-        for (const token of storedToken) {
+        for (const token of storedTokens) {
             const match = await bcrypt.compare(
                 refreshToken,
                 token.token_hash
@@ -139,7 +166,6 @@ async function createAccessToken(req, res, next) {
             return res.status(403).json({ error: "Invalid refresh token" });
         }
 
-        // 3. create new access token
         const accessToken = jwt.sign(
             { sub: payload.sub },
             process.env.ACCESS_TOKEN_SECRET,
@@ -155,5 +181,5 @@ async function createAccessToken(req, res, next) {
 module.exports = {
     registerUser,
     loginUser,
-    createAccessToken
+    createAccessToken,
 };
