@@ -70,11 +70,11 @@ async function registerUser(req, res, next) {
             message: 'Registration successful',
             accessToken,
             user: {
-                id,
-                username,
-                first_name,
-                last_name,
-                profile_picture_url
+                id: user.id,
+                username: user.username,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                profile_picture_url: user.profile_picture_url
             }
         });
 
@@ -130,11 +130,11 @@ async function loginUser(req, res, next) {
         return res.json({
             accessToken,
             user: {
-                id,
-                username,
-                first_name,
-                last_name,
-                profile_picture_url
+                id: user.id,
+                username: user.username,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                profile_picture_url: user.profile_picture_url
             }
         });
 
