@@ -4,7 +4,7 @@ import { useLogout } from '../hooks/useLogout';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { authUser } = useAuthContext();
+  const { user } = useAuthContext();
   const { logout } = useLogout();
 
   const handleClick = () => {
@@ -19,7 +19,7 @@ const Navbar = () => {
         </Link>
 
         <nav>
-          {!authUser && (
+          {!user && (
             <div className={styles.authLinks}>
               <Link to="/login" className={styles.loginLink}>
                 Login
@@ -31,17 +31,18 @@ const Navbar = () => {
             </div>
           )}
 
-          {authUser && (
+          {user && (
             <div className={styles.userMenu}>
-              <span className={styles.username}>{authUser.username}</span>
+              <span className={styles.username}>{user.user.username}</span>
 
-              {authUser.profile_picture_url && (
-                <img
-                  src={authUser.profile_picture_url}
-                  alt="profile"
-                  className={styles.avatar}
-                />
-              )}
+              <img
+                src={
+                  user.user.profile_picture_url ||
+                  'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
+                }
+                alt="profile"
+                className={styles.avatar}
+              />
 
               <button className={styles.logoutButton} onClick={handleClick}>
                 Logout
