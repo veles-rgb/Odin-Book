@@ -3,12 +3,12 @@ const { validate: isUUID } = require("uuid");
 
 async function getUser(req, res, next) {
     try {
+        const user = req.user;
         const { identifier } = req.params;
-
-        let user;
+        let profileUser;
 
         if (isUUID(identifier)) {
-            user = await prisma.user.findUnique({
+            profileUser = await prisma.user.findUnique({
                 where: {
                     id: identifier,
                 },
@@ -22,7 +22,7 @@ async function getUser(req, res, next) {
                 }
             });
         } else {
-            user = await prisma.user.findUnique({
+            profileUser = await prisma.user.findUnique({
                 where: {
                     username: identifier
                 },
@@ -37,13 +37,80 @@ async function getUser(req, res, next) {
             });
         }
 
-        if (!user) {
+        if (!profileUser) {
             return res.status(404).json({
                 error: "User not found",
             });
         }
 
-        res.status(200).json({ user });
+        const [follows, followRequests] = await prisma.$transaction([
+            prisma.follow.findMany({
+                where: {
+                    OR: [
+                        {
+                            follower_id: user.id,
+                            following_id: profileUser.id
+                        },
+                        {
+                            follower_id: profileUser.id,
+                            following_id: user.id
+                        },
+                    ]
+                },
+            }),
+
+            prisma.followRequest.findMany({
+                where: {
+                    OR: [
+                        {
+                            requester_id: user.id,
+                            receiver_id: profileUser.id
+                        },
+                        {
+                            requester_id: profileUser.id,
+                            receiver_id: user.id
+                        },
+                    ],
+                },
+            })
+        ]);
+
+        const isFollowing = follows.some(
+            (follow) =>
+                follow.follower_id === user.id &&
+                follow.following_id === profileUser.id
+
+        );
+
+        const isFollowedBy = follows.some(
+            (follow) =>
+                follow.follower_id === profileUser.id &&
+                follow.following_id === user.id
+
+        );
+
+        const outgoingRequestPending = followRequests.some(
+            (request) =>
+                request.requester_id === user.id &&
+                request.receiver_id === profileUser.id
+
+        );
+
+        const incomingRequestPending = followRequests.some(
+            (request) =>
+                request.requester_id === profileUser.id &&
+                request.receiver_id === user.id
+
+        );
+
+        const relationship = {
+            isFollowing,
+            isFollowedBy,
+            outgoingRequestPending,
+            incomingRequestPending,
+        };
+
+        return res.status(200).json({ profileUser, relationship });
 
     } catch (error) {
         return next(error);
