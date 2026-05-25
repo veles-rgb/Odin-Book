@@ -69,6 +69,13 @@ async function registerUser(req, res, next) {
         return res.status(201).json({
             message: 'Registration successful',
             accessToken,
+            user: {
+                id,
+                username,
+                first_name,
+                last_name,
+                profile_picture_url
+            }
         });
 
     } catch (error) {
@@ -120,7 +127,16 @@ async function loginUser(req, res, next) {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        return res.json({ accessToken });
+        return res.json({
+            accessToken,
+            user: {
+                id,
+                username,
+                first_name,
+                last_name,
+                profile_picture_url
+            }
+        });
 
     } catch (error) {
         return next(error);
