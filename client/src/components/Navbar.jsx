@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
-import { useLogout } from '../hooks/useLogout';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { user } = useAuthContext();
-  const { logout } = useLogout();
+  const { user, logout } = useAuthContext();
 
   const handleClick = () => {
     logout();
@@ -33,11 +31,11 @@ const Navbar = () => {
 
           {user && (
             <div className={styles.userMenu}>
-              <span className={styles.username}>{user.user.username}</span>
+              <span className={styles.username}>{user.username}</span>
 
               <img
                 src={
-                  user.user.profile_picture_url ||
+                  user.profile_picture_url ||
                   'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
                 }
                 alt="profile"
