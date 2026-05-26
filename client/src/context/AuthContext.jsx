@@ -1,34 +1,44 @@
-import { createContext, useReducer, useEffect } from 'react';
+import { useState } from 'react';
+import { createContext, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-export const authReducer = (state, action) => {
-  switch (action.type) {
-    case 'LOGIN':
-      return { user: action.payload };
-    case 'LOGOUT':
-      return { user: null };
-    default:
-      return state;
-  }
-};
-
-export const AuthContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, {
-    user: null,
+export const AuthContextPorvider = ({ children }) => {
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      dispatch({ type: 'LOGIN', payload: user });
-    }
-  }, []);
+  const [accessToken, setAccessToken] = useState(() => {
+    return localStorage.getItem('accessToken');
+  });
 
-  console.log('AuthContext state: ', state);
+  const login = ({ user, accessToken }) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('accessToken', accessToken);
+
+    setUser(user);
+    setAccessToken(accessToken);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+
+    setUser(null);
+    setAccessToken(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ ...state, dispatch }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        accessToken,
+        login,
+        logout,
+        isLoggedIn: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
