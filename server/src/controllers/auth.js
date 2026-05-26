@@ -146,7 +146,11 @@ async function createAccessToken(req, res, next) {
     try {
         const refreshToken = req.cookies?.refreshToken;
 
-        if (!refreshToken) return res.status(401).json({ error: 'Refresh token required' });
+        if (!refreshToken) {
+            return res.status(401).json({
+                error: 'Refresh token required',
+            });
+        }
 
         const payload = jwt.verify(
             refreshToken,
@@ -160,7 +164,9 @@ async function createAccessToken(req, res, next) {
         });
 
         if (storedTokens.length === 0) {
-            return res.status(403).json({ error: "Invalid refresh token" });
+            return res.status(403).json({
+                error: 'Invalid refresh token',
+            });
         }
 
         let validToken = null;
@@ -178,18 +184,41 @@ async function createAccessToken(req, res, next) {
         }
 
         if (!validToken) {
-            return res.status(403).json({ error: "Invalid refresh token" });
+            return res.status(403).json({
+                error: 'Invalid refresh token',
+            });
         }
 
-        const accessToken = jwt.sign(
-            { sub: payload.sub },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' }
-        );
+        const user = await prisma.user.findUnique({
+            where: {
+                id: payload.sub,
+            },
+            select: {
+                id: true,
+                username: true,
+                first_name: true,
+                last_name: true,
+                profile_picture_url: true,
+            },
+        });
 
-        return res.json({ accessToken });
+        if (!user) {
+            return res.status(403).json({
+                error: 'Invalid refresh token',
+            });
+        }
+
+        const accessToken = generateAccessToken(user);
+
+        return res.json({
+            accessToken,
+            user,
+        });
+
     } catch (error) {
-        return res.status(403).json({ error: 'Invalid refresh token' });
+        return res.status(403).json({
+            error: 'Invalid refresh token',
+        });
     }
 }
 
