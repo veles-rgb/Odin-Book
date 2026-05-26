@@ -4,36 +4,39 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useLogin = () => {
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(null);
-    const { dispatch } = useAuthContext();
+    const [isLoading, setIsLoading] = useState(false);
+    const { login } = useAuthContext();
 
-    const login = async (username, password) => {
-        setIsLoading(true);
-        setError(null);
+    const loginUser = async (username, password) => {
+        try {
+            setIsLoading(true);
+            setError(null);
 
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-            method: 'POST',
-            credentials: "include",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
 
-        const json = await response.json();
+            const data = await response.json();
 
-        if (!response.ok) {
-            setIsLoading(false);
-            setError(json.error);
-        }
-        if (response.ok) {
-            // Save user to local storage
-            localStorage.setItem('user', JSON.stringify(json));
+            if (!response.ok) {
+                setError(data.error);
+                return;
+            }
 
-            // Update AuthContext
-            dispatch({ type: "LOGIN", payload: json });
+            login({
+                user: data.user,
+                accessToken: data.accessToken,
+            });
 
+        } catch (error) {
+            setError('Something went wrong');
+        } finally {
             setIsLoading(false);
         }
     };
 
-    return { login, isLoading, error };
+    return { loginUser, isLoading, error };
 };

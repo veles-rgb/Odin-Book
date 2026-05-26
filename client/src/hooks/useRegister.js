@@ -1,39 +1,51 @@
 import { useState } from "react";
 import { useAuthContext } from "./useAuthContext";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useRegister = () => {
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(null);
-    const { dispatch } = useAuthContext();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const register = async (firstName, lastName, username, password) => {
-        setIsLoading(true);
-        setError(null);
+    const { login } = useAuthContext();
 
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-            method: 'POST',
-            credentials: "include",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ first_name: firstName, last_name: lastName, username, password })
-        });
+    const registerUser = async (firstName, lastName, username, password) => {
+        try {
+            setIsLoading(true);
+            setError(null);
 
-        const json = await response.json();
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    username,
+                    password,
+                }),
+            });
 
-        if (!response.ok) {
-            setIsLoading(false);
-            setError(json.error);
-        }
-        if (response.ok) {
-            // Save user to local storage
-            localStorage.setItem('user', JSON.stringify(json));
+            const data = await response.json();
 
-            // Update AuthContext
-            dispatch({ type: "LOGIN", payload: json });
+            if (!response.ok) {
+                setError(data.error);
+                return;
+            }
 
+            login({
+                user: data.user,
+                accessToken: data.accessToken,
+            });
+
+        } catch (error) {
+            setError('Something went wrong');
+        } finally {
             setIsLoading(false);
         }
     };
 
-    return { register, isLoading, error };
+    return { registerUser, isLoading, error };
 };
