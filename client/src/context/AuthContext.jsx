@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { createContext, useEffect } from 'react';
 
 export const AuthContext = createContext();
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export const AuthContextPorvider = ({ children }) => {
+export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
@@ -28,6 +29,33 @@ export const AuthContextPorvider = ({ children }) => {
     setUser(null);
     setAccessToken(null);
   };
+
+  useEffect(() => {
+    const refreshAuth = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          logout();
+          return;
+        }
+
+        const data = await response.json();
+
+        login({
+          user: data.user,
+          accessToken: data.accessToken,
+        });
+      } catch (error) {
+        logout();
+      }
+    };
+
+    refreshAuth();
+  }, []);
 
   return (
     <AuthContext.Provider
