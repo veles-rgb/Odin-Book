@@ -222,8 +222,63 @@ async function createAccessToken(req, res, next) {
     }
 }
 
+async function logoutUser(req, res, next) {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+
+        if (refreshToken) {
+            try {
+                const payload = jwt.verify(
+                    refreshToken,
+                    process.env.REFRESH_TOKEN_SECRET
+                );
+
+                const storedTokens = await prisma.refreshToken.findMany({
+                    where: {
+                        user_id: payload.sub,
+                    },
+                });
+
+                for (const token of storedTokens) {
+                    const match = await bcrypt.compare(
+                        refreshToken,
+                        token.token_hash
+                    );
+
+                    if (match) {
+                        await prisma.refreshToken.delete({
+                            where: {
+                                id: token.id,
+                            },
+                        });
+
+                        break;
+                    }
+                }
+            } catch (_error) {
+
+            }
+        }
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/api/auth',
+        });
+
+        return res.status(200).json({
+            message: 'Logged out successfully',
+        });
+
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
     createAccessToken,
+    logoutUser,
 };
