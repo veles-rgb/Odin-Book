@@ -1,5 +1,5 @@
 import styles from './PostCard.module.css';
-import { GrLike } from 'react-icons/gr';
+import LikeButton from './LikeButton';
 
 const PostCard = ({ post }) => {
   return (
@@ -28,10 +28,12 @@ const PostCard = ({ post }) => {
           View comments ({post.commentCount})
         </button>
 
-        <button className={styles.likeButton}>
-          <GrLike />
-          <span>{post.likeCount}</span>
-        </button>
+        <LikeButton
+          target={'post'}
+          targetId={post.id}
+          likedByMe={post.likedByMe}
+          likeCount={post.likeCount}
+        />
       </div>
     </article>
   );
