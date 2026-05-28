@@ -31,9 +31,13 @@ const Comment = ({ comment }) => {
       <div className={styles.content}>{comment.content}</div>
 
       <div className={styles.actions}>
-        <button className={styles.replyButton} onClick={handleViewReplies}>
-          View replies ({comment.replyCount})
-        </button>
+        {comment.replyCount > 0 && (
+          <button className={styles.replyButton} onClick={handleViewReplies}>
+            {viewReplies
+              ? 'Hide replies'
+              : `View replies (${comment.replyCount})`}
+          </button>
+        )}
 
         <LikeButton
           target="comment"
