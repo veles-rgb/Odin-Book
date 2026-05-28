@@ -1,7 +1,16 @@
+import { useState } from 'react';
 import styles from './PostCard.module.css';
 import LikeButton from './LikeButton';
 
+import CommentSection from './CommentSection';
+
 const PostCard = ({ post }) => {
+  const [viewComments, setViewComments] = useState(false);
+
+  const HandleShowComments = () => {
+    setViewComments((prev) => !prev);
+  };
+
   return (
     <article className={styles.card}>
       <div className={styles.header}>
@@ -24,7 +33,7 @@ const PostCard = ({ post }) => {
       <div className={styles.content}>{post.content}</div>
 
       <div className={styles.footer}>
-        <button className={styles.commentsButton}>
+        <button className={styles.commentsButton} onClick={HandleShowComments}>
           View comments ({post.commentCount})
         </button>
 
@@ -35,6 +44,7 @@ const PostCard = ({ post }) => {
           likeCount={post.likeCount}
         />
       </div>
+      {viewComments && <CommentSection postId={post.id} />}
     </article>
   );
 };
