@@ -4,20 +4,46 @@ import { useLogout } from './useLogout';
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useApiFetch = () => {
-    const { accessToken } = useAuthContext();
+    const { accessToken, login } = useAuthContext();
     const { logout } = useLogout();
 
     const apiFetch = async (endpoint, options = {}) => {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...options,
-            credentials: 'include',
+        const makeRequest = async (token) => {
+            return fetch(`${API_BASE_URL}${endpoint}`, {
+                ...options,
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                    ...options.headers,
+                },
+            });
+        };
 
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-                ...options.headers,
-            },
+        let response = await makeRequest(accessToken);
+
+        if (response.status !== 401 && response.status !== 403) {
+            return response;
+        }
+
+        const refreshResponse = await fetch(`${API_BASE_URL}/api/auth/token`, {
+            method: 'POST',
+            credentials: 'include',
         });
+
+        if (!refreshResponse.ok) {
+            await logout();
+            return null;
+        }
+
+        const data = await refreshResponse.json();
+
+        login({
+            user: data.user,
+            accessToken: data.accessToken,
+        });
+
+        response = await makeRequest(data.accessToken);
 
         if (response.status === 401 || response.status === 403) {
             await logout();
