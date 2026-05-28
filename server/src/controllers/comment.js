@@ -353,10 +353,13 @@ async function getPostComments(req, res, next) {
 
 async function getCommentReplies(req, res, next) {
     try {
+        const user = req.user;
         const { id } = req.params;
 
         if (!isUUID(id)) {
-            return res.status(400).json({ error: "Invalid comment ID." });
+            return res.status(400).json({
+                error: "Invalid comment ID.",
+            });
         }
 
         const comment = await prisma.comment.findFirst({
@@ -365,15 +368,72 @@ async function getCommentReplies(req, res, next) {
             },
         });
 
-        if (!comment) res.status(404).json({ error: "Comment not found." });
+        if (!comment) {
+            return res.status(404).json({
+                error: "Comment not found.",
+            });
+        }
 
         const replies = await prisma.comment.findMany({
             where: {
                 parent_id: id,
-            }
+            },
+            orderBy: {
+                created_at: "asc",
+            },
+            select: {
+                id: true,
+                post_id: true,
+                parent_id: true,
+                user_id: true,
+                content: true,
+                created_at: true,
+                updated_at: true,
+
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        commentLikes: true,
+                    },
+                },
+
+                commentLikes: {
+                    where: {
+                        user_id: user.id,
+                    },
+                    select: {
+                        id: true,
+                    },
+                },
+            },
         });
 
-        return res.status(200).json({ replies });
+        const formattedReplies = replies.map((reply) => ({
+            id: reply.id,
+            post_id: reply.post_id,
+            parent_id: reply.parent_id,
+            user_id: reply.user_id,
+            content: reply.content,
+            created_at: reply.created_at,
+            updated_at: reply.updated_at,
+            user: reply.user,
+            likeCount: reply._count.commentLikes,
+            likedByMe: reply.commentLikes.length > 0,
+        }));
+
+        return res.status(200).json({
+            replies: formattedReplies,
+        });
+
     } catch (error) {
         return next(error);
     }
