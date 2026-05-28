@@ -156,90 +156,6 @@ async function getPostById(req, res, next) {
                         id: true,
                     },
                 },
-
-                comments: {
-                    where: {
-                        parent_id: null,
-                    },
-                    orderBy: {
-                        created_at: "asc",
-                    },
-                    select: {
-                        id: true,
-                        post_id: true,
-                        parent_id: true,
-                        user_id: true,
-                        content: true,
-                        created_at: true,
-                        updated_at: true,
-
-                        user: {
-                            select: {
-                                id: true,
-                                username: true,
-                                first_name: true,
-                                last_name: true,
-                                profile_picture_url: true,
-                            },
-                        },
-
-                        _count: {
-                            select: {
-                                commentLikes: true,
-                                comments: true,
-                            },
-                        },
-
-                        commentLikes: {
-                            where: {
-                                user_id: user.id,
-                            },
-                            select: {
-                                id: true,
-                            },
-                        },
-
-                        comments: {
-                            orderBy: {
-                                created_at: "asc",
-                            },
-                            select: {
-                                id: true,
-                                post_id: true,
-                                parent_id: true,
-                                user_id: true,
-                                content: true,
-                                created_at: true,
-                                updated_at: true,
-
-                                user: {
-                                    select: {
-                                        id: true,
-                                        username: true,
-                                        first_name: true,
-                                        last_name: true,
-                                        profile_picture_url: true,
-                                    },
-                                },
-
-                                _count: {
-                                    select: {
-                                        commentLikes: true,
-                                    },
-                                },
-
-                                commentLikes: {
-                                    where: {
-                                        user_id: user.id,
-                                    },
-                                    select: {
-                                        id: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
             },
         });
 
@@ -248,36 +164,6 @@ async function getPostById(req, res, next) {
                 error: "Post not found. It either does not exist or was removed.",
             });
         }
-
-        const formattedComments = post.comments.map((comment) => {
-            const formattedReplies = comment.comments.map((reply) => ({
-                id: reply.id,
-                post_id: reply.post_id,
-                parent_id: reply.parent_id,
-                user_id: reply.user_id,
-                content: reply.content,
-                created_at: reply.created_at,
-                updated_at: reply.updated_at,
-                user: reply.user,
-                likeCount: reply._count.commentLikes,
-                likedByMe: reply.commentLikes.length > 0,
-            }));
-
-            return {
-                id: comment.id,
-                post_id: comment.post_id,
-                parent_id: comment.parent_id,
-                user_id: comment.user_id,
-                content: comment.content,
-                created_at: comment.created_at,
-                updated_at: comment.updated_at,
-                user: comment.user,
-                likeCount: comment._count.commentLikes,
-                likedByMe: comment.commentLikes.length > 0,
-                replyCount: comment._count.comments,
-                replies: formattedReplies,
-            };
-        });
 
         const formattedPost = {
             id: post.id,
@@ -289,7 +175,6 @@ async function getPostById(req, res, next) {
             likeCount: post._count.postLikes,
             likedByMe: post.postLikes.length > 0,
             commentCount: post._count.comments,
-            comments: formattedComments,
         };
 
         return res.status(200).json({ post: formattedPost });
