@@ -1,0 +1,63 @@
+import { useState, useEffect } from 'react';
+import { useApiFetch } from '../hooks/useApiFetch';
+import styles from './CommentSection.module.css';
+import CommentReply from './CommentReply';
+
+const CommentReplySection = ({ commentId }) => {
+  const [replies, setReplies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const { apiFetch } = useApiFetch();
+
+  useEffect(() => {
+    const fetchReplies = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await apiFetch(`/api/comment/${commentId}/replies`);
+
+        if (!response) return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error);
+          return;
+        }
+
+        setReplies(data.replies);
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        setError('Something went wrong.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReplies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [commentId]);
+
+  return (
+    <section className={styles.commentSection}>
+      {error && <div className={styles.error}>{error}</div>}
+      {isLoading && <div className={styles.loading}>Loading replies...</div>}
+
+      {!isLoading && replies.length > 0 && (
+        <div className={styles.commentList}>
+          {replies.map((reply) => (
+            <CommentReply comment={reply} key={reply.id} />
+          ))}
+        </div>
+      )}
+
+      {!isLoading && replies.length === 0 && (
+        <div className={styles.empty}>No replies yet.</div>
+      )}
+    </section>
+  );
+};
+
+export default CommentReplySection;
