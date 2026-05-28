@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
-import styles from './CommentSection.module.css';
+import styles from './CommentReplySection.module.css';
 import CommentReply from './CommentReply';
 
 const CommentReplySection = ({ commentId }) => {
@@ -41,12 +41,12 @@ const CommentReplySection = ({ commentId }) => {
   }, [commentId]);
 
   return (
-    <section className={styles.commentSection}>
+    <section className={styles.replySection}>
       {error && <div className={styles.error}>{error}</div>}
       {isLoading && <div className={styles.loading}>Loading replies...</div>}
 
       {!isLoading && replies.length > 0 && (
-        <div className={styles.commentList}>
+        <div className={styles.replyList}>
           {replies.map((reply) => (
             <CommentReply comment={reply} key={reply.id} />
           ))}
