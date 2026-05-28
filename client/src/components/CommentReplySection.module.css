@@ -1,0 +1,36 @@
+.replySection {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    margin-top: 0.75rem;
+
+    padding-left: 1rem;
+
+    border-left: 2px solid #e5e7eb;
+
+    overflow: hidden;
+}
+
+.replyList {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+
+    overflow: hidden;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 0.9rem;
+}
+
+.loading,
+.empty {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
