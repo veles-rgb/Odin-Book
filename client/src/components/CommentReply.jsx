@@ -1,9 +1,9 @@
 import LikeButton from './LikeButton';
-import styles from './Comment.module.css';
+import styles from './CommentReply.module.css';
 
 const CommentReply = ({ comment }) => {
   return (
-    <article className={styles.comment}>
+    <article className={styles.reply}>
       <div className={styles.header}>
         <img
           className={styles.avatar}
