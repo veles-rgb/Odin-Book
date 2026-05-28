@@ -1,7 +1,15 @@
 import LikeButton from './LikeButton';
 import styles from './Comment.module.css';
+import { useState } from 'react';
+import CommentReplySection from './CommentReplySection';
 
 const Comment = ({ comment }) => {
+  const [viewReplies, setViewReplies] = useState(false);
+
+  const handleViewReplies = () => {
+    setViewReplies((prev) => !prev);
+  };
+
   return (
     <article className={styles.comment}>
       <div className={styles.header}>
@@ -23,7 +31,7 @@ const Comment = ({ comment }) => {
       <div className={styles.content}>{comment.content}</div>
 
       <div className={styles.actions}>
-        <button className={styles.replyButton}>
+        <button className={styles.replyButton} onClick={handleViewReplies}>
           View replies ({comment.replyCount})
         </button>
 
@@ -34,6 +42,7 @@ const Comment = ({ comment }) => {
           likeCount={comment.likeCount}
         />
       </div>
+      {viewReplies && <CommentReplySection commentId={comment.id} />}
     </article>
   );
 };
