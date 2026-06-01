@@ -3,7 +3,7 @@ import { useApiFetch } from '../hooks/useApiFetch';
 import styles from './CommentReplySection.module.css';
 import CommentReply from './CommentReply';
 
-const CommentReplySection = ({ commentId }) => {
+const CommentReplySection = ({ commentId, refreshKey }) => {
   const [replies, setReplies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -38,7 +38,7 @@ const CommentReplySection = ({ commentId }) => {
 
     fetchReplies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [commentId]);
+  }, [commentId, refreshKey]);
 
   return (
     <section className={styles.replySection}>
@@ -48,7 +48,13 @@ const CommentReplySection = ({ commentId }) => {
       {!isLoading && replies.length > 0 && (
         <div className={styles.replyList}>
           {replies.map((reply) => (
-            <CommentReply comment={reply} key={reply.id} />
+            <CommentReply
+              comment={reply}
+              key={reply.id}
+              onReplyCreated={(newReply) => {
+                setReplies((prev) => [...prev, newReply]);
+              }}
+            />
           ))}
         </div>
       )}

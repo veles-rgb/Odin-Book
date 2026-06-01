@@ -1,7 +1,55 @@
 import LikeButton from './LikeButton';
 import styles from './CommentReply.module.css';
+import { useState } from 'react';
+import { useApiFetch } from '../hooks/useApiFetch';
 
-const CommentReply = ({ comment }) => {
+const CommentReply = ({ comment, onReplyCreated }) => {
+  const [showReply, setShowReply] = useState(false);
+  const [userReply, setUserReply] = useState('');
+  const [userReplyLoading, setUserReplyLoading] = useState(false);
+  const [userReplyError, setUserReplyError] = useState(null);
+
+  const { apiFetch } = useApiFetch();
+
+  const handleShowReply = () => {
+    setShowReply((prev) => !prev);
+  };
+
+  const handleSubmitReply = async (e) => {
+    e.preventDefault();
+
+    try {
+      setUserReplyLoading(true);
+      setUserReplyError(null);
+
+      const response = await apiFetch(`/api/comment/reply/${comment.id}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          content: userReply,
+        }),
+      });
+
+      if (!response) return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setUserReplyError(data.error);
+        return;
+      }
+
+      setUserReply('');
+      setShowReply(false);
+
+      onReplyCreated?.(data.comment);
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      setUserReplyError('Something went wrong.');
+    } finally {
+      setUserReplyLoading(false);
+    }
+  };
+
   return (
     <article className={styles.reply}>
       <div className={styles.header}>
@@ -20,10 +68,24 @@ const CommentReply = ({ comment }) => {
         </div>
       </div>
 
-      <div className={styles.content}>{comment.content}</div>
+      <div className={styles.content}>
+        {comment.replyingToUser && (
+          <span className={styles.replyingTo}>
+            @{comment.replyingToUser.username}{' '}
+          </span>
+        )}
+
+        {comment.content}
+      </div>
 
       <div className={styles.actions}>
-        <button className={styles.replyButton}>Reply</button>
+        <button
+          type="button"
+          className={styles.replyButton}
+          onClick={handleShowReply}
+        >
+          Reply
+        </button>
 
         <LikeButton
           target="comment"
@@ -32,6 +94,31 @@ const CommentReply = ({ comment }) => {
           likeCount={comment.likeCount}
         />
       </div>
+
+      {showReply && (
+        <div className={styles.replyFormWrapper}>
+          <form onSubmit={handleSubmitReply} className={styles.replyForm}>
+            <textarea
+              className={styles.replyTextarea}
+              placeholder={`Reply to ${comment.user.username}`}
+              value={userReply}
+              onChange={(e) => setUserReply(e.target.value)}
+            />
+
+            <button
+              type="submit"
+              className={styles.sendButton}
+              disabled={userReplyLoading}
+            >
+              Send
+            </button>
+
+            {userReplyError && (
+              <div className={styles.error}>{userReplyError}</div>
+            )}
+          </form>
+        </div>
+      )}
     </article>
   );
 };

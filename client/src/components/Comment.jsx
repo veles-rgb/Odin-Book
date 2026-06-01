@@ -2,12 +2,57 @@ import LikeButton from './LikeButton';
 import styles from './Comment.module.css';
 import { useState } from 'react';
 import CommentReplySection from './CommentReplySection';
+import { useApiFetch } from '../hooks/useApiFetch';
 
 const Comment = ({ comment }) => {
   const [viewReplies, setViewReplies] = useState(false);
+  const [viewReplyBox, setViewReplyBox] = useState(false);
+
+  const [userReply, setUserReply] = useState('');
+  const [userReplyLoading, setUserReplyLoading] = useState(false);
+  const [userReplyError, setUserReplyError] = useState(null);
+
+  const [replyRefreshKey, setReplyRefreshKey] = useState(0);
+
+  const { apiFetch } = useApiFetch();
 
   const handleViewReplies = () => {
     setViewReplies((prev) => !prev);
+  };
+
+  const handleViewReplyBox = () => {
+    setViewReplyBox((prev) => !prev);
+  };
+
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setUserReplyLoading(true);
+      setUserReplyError(null);
+
+      const response = await apiFetch(`/api/comment/reply/${comment.id}`, {
+        method: 'POST',
+        body: JSON.stringify({ content: userReply }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setUserReplyError(data.error);
+      }
+
+      setUserReply('');
+      setViewReplyBox(false);
+      setViewReplies(true);
+      setReplyRefreshKey((prev) => prev + 1);
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      setUserReplyError('Something went wrong.');
+      return;
+    } finally {
+      setUserReplyLoading(false);
+    }
   };
 
   return (
@@ -39,6 +84,8 @@ const Comment = ({ comment }) => {
           </button>
         )}
 
+        <button onClick={handleViewReplyBox}>Reply</button>
+
         <LikeButton
           target="comment"
           targetId={comment.id}
@@ -46,7 +93,27 @@ const Comment = ({ comment }) => {
           likeCount={comment.likeCount}
         />
       </div>
-      {viewReplies && <CommentReplySection commentId={comment.id} />}
+
+      {viewReplyBox && (
+        <form onSubmit={handleReplySubmit}>
+          <textarea
+            value={userReply}
+            onChange={(e) => setUserReply(e.target.value)}
+            placeholder="Type your reply..."
+          ></textarea>
+          <button type="submit" disabled={userReplyLoading}>
+            Send
+          </button>
+
+          {userReplyError && <div>{userReplyError}</div>}
+        </form>
+      )}
+      {viewReplies && (
+        <CommentReplySection
+          commentId={comment.id}
+          refreshKey={replyRefreshKey}
+        />
+      )}
     </article>
   );
 };
