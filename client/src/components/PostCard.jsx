@@ -34,7 +34,9 @@ const PostCard = ({ post }) => {
 
       <div className={styles.footer}>
         <button className={styles.commentsButton} onClick={HandleShowComments}>
-          View comments ({post.commentCount})
+          {post.commentCount > 0
+            ? `View comments (${post.commentCount})`
+            : 'Add comment'}
         </button>
 
         <LikeButton
