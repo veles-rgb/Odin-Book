@@ -3,6 +3,8 @@ import { useApiFetch } from '../hooks/useApiFetch';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/CreatePostModal';
 
+import styles from './Home.module.css';
+
 const Home = () => {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
@@ -68,7 +70,7 @@ const Home = () => {
   };
 
   return (
-    <main>
+    <main className={styles.homePage}>
       <div>
         <button type="button" onClick={handleShowCreatePost}>
           Create Post
@@ -84,9 +86,9 @@ const Home = () => {
         )}
       </div>
 
-      {error && <div>{error}</div>}
+      {error && <div className={styles.error}>{error}</div>}
 
-      <div>
+      <div className={styles.postsContainer}>
         {posts.map((post) => (
           <PostCard post={post} key={post.id} />
         ))}
