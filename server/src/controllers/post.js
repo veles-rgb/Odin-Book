@@ -228,9 +228,90 @@ async function getPostById(req, res, next) {
     }
 }
 
+async function getFeedPosts(req, res, next) {
+    try {
+        const user = req.user;
+
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        const skip = (page - 1) * limit;
+
+        const [posts, totalPosts] = await prisma.$transaction([
+            prisma.post.findMany({
+                skip,
+                take: limit,
+                orderBy: {
+                    created_at: 'desc',
+                },
+                select: {
+                    id: true,
+                    content: true,
+                    created_at: true,
+                    updated_at: true,
+                    user_id: true,
+
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                            first_name: true,
+                            last_name: true,
+                            profile_picture_url: true,
+                        },
+                    },
+
+                    _count: {
+                        select: {
+                            postLikes: true,
+                            comments: true,
+                        },
+                    },
+
+                    postLikes: {
+                        where: {
+                            user_id: user.id,
+                        },
+                        select: {
+                            id: true,
+                        },
+                    },
+                },
+            }),
+
+            prisma.post.count(),
+        ]);
+
+        const hasNextPage = page * limit < totalPosts;
+
+        const formattedPosts = posts.map((post) => ({
+            id: post.id,
+            user_id: post.user_id,
+            content: post.content,
+            created_at: post.created_at,
+            updated_at: post.updated_at,
+
+            user: post.user,
+
+            likeCount: post._count.postLikes,
+            likedByMe: post.postLikes.length > 0,
+
+            commentCount: post._count.comments,
+        }));
+
+        return res.status(200).json({
+            posts: formattedPosts,
+            hasNextPage,
+        });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     createPost,
     editPost,
     deletePost,
     getPostById,
+    getFeedPosts,
 };
