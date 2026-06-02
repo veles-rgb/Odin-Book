@@ -7,13 +7,17 @@ async function createPost(req, res, next) {
         const { content } = req.body;
 
         if (!content) {
-            return res.status(400).json({ error: "Post content is required" });
+            return res.status(400).json({
+                error: "Post content is required",
+            });
         }
 
         const trimmedContent = content.trim();
 
         if (!trimmedContent) {
-            return res.status(400).json({ error: "Post content is required" });
+            return res.status(400).json({
+                error: "Post content is required",
+            });
         }
 
         const post = await prisma.post.create({
@@ -21,9 +25,50 @@ async function createPost(req, res, next) {
                 user_id: user.id,
                 content: trimmedContent,
             },
+            select: {
+                id: true,
+                content: true,
+                created_at: true,
+                updated_at: true,
+                user_id: true,
+
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        postLikes: true,
+                        comments: true,
+                    },
+                },
+            },
         });
 
-        return res.status(201).json({ post });
+        const formattedPost = {
+            id: post.id,
+            user_id: post.user_id,
+            content: post.content,
+            created_at: post.created_at,
+            updated_at: post.updated_at,
+            user: post.user,
+
+            likeCount: post._count.postLikes,
+            likedByMe: false,
+
+            commentCount: post._count.comments,
+        };
+
+        return res.status(201).json({
+            post: formattedPost,
+        });
+
     } catch (error) {
         return next(error);
     }
