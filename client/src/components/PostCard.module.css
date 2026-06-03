@@ -89,3 +89,7 @@
 .commentsButton:hover {
     background-color: #f3f4f6;
 }
+
+.dropdown {
+    margin-left: auto;
+}
