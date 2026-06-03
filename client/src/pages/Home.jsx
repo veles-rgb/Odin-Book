@@ -3,7 +3,7 @@ import { useApiFetch } from '../hooks/useApiFetch';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/CreatePostModal';
 
-import styles from './Home.module.css';
+import styles from './styles/Home.module.css';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);

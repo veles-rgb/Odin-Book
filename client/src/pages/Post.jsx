@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useApiFetch } from '../hooks/useApiFetch';
 import PostCard from '../components/PostCard';
 
-import styles from './Post.module.css';
+import styles from './styles/Post.module.css';
 
 const Post = () => {
   const { postId } = useParams();
