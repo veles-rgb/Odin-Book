@@ -1,15 +1,23 @@
-import LikeButton from './LikeButton';
 import styles from './CommentReply.module.css';
 import { useState } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
+import { useAuthContext } from '../hooks/useAuthContext';
+
+import LikeButton from './LikeButton';
+import OptionsMenu from './OptionsMenu';
 
 const CommentReply = ({ comment, onReplyCreated }) => {
+  const { user } = useAuthContext();
   const [showReply, setShowReply] = useState(false);
   const [userReply, setUserReply] = useState('');
   const [userReplyLoading, setUserReplyLoading] = useState(false);
   const [userReplyError, setUserReplyError] = useState(null);
 
   const { apiFetch } = useApiFetch();
+
+  const userOwnsReply = () => {
+    return user.id === comment.user_id;
+  };
 
   const handleShowReply = () => {
     setShowReply((prev) => !prev);
@@ -66,6 +74,13 @@ const CommentReply = ({ comment, onReplyCreated }) => {
           <div className={styles.username}>{comment.user.username}</div>
           <div className={styles.timestamp}>{comment.updated_at}</div>
         </div>
+
+        {userOwnsReply() && (
+          <OptionsMenu>
+            <div>Test</div>
+            <div>Test</div>
+          </OptionsMenu>
+        )}
       </div>
 
       <div className={styles.content}>
