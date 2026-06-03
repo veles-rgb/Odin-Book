@@ -38,7 +38,7 @@ const PostCard = ({ post }) => {
         </div>
 
         {userOwnsPost() && (
-          <OptionsMenu className={styles.dropdown}>
+          <OptionsMenu>
             <div>Test</div>
             <div>Test</div>
           </OptionsMenu>
