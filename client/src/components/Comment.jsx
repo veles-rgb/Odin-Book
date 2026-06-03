@@ -1,10 +1,14 @@
-import LikeButton from './LikeButton';
 import styles from './Comment.module.css';
 import { useState } from 'react';
-import CommentReplySection from './CommentReplySection';
 import { useApiFetch } from '../hooks/useApiFetch';
+import { useAuthContext } from '../hooks/useAuthContext';
+
+import OptionsMenu from './OptionsMenu';
+import CommentReplySection from './CommentReplySection';
+import LikeButton from './LikeButton';
 
 const Comment = ({ comment }) => {
+  const { user } = useAuthContext();
   const [viewReplies, setViewReplies] = useState(false);
   const [viewReplyBox, setViewReplyBox] = useState(false);
 
@@ -15,6 +19,10 @@ const Comment = ({ comment }) => {
   const [replyRefreshKey, setReplyRefreshKey] = useState(0);
 
   const { apiFetch } = useApiFetch();
+
+  const userOwnsComment = () => {
+    return user.id === comment.user_id;
+  };
 
   const handleViewReplies = () => {
     setViewReplies((prev) => !prev);
@@ -71,6 +79,13 @@ const Comment = ({ comment }) => {
           <div className={styles.username}>{comment.user.username}</div>
           <div className={styles.timestamp}>{comment.updated_at}</div>
         </div>
+
+        {userOwnsComment() && (
+          <OptionsMenu>
+            <div>Test</div>
+            <div>Test</div>
+          </OptionsMenu>
+        )}
       </div>
 
       <div className={styles.content}>{comment.content}</div>
