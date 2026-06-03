@@ -80,13 +80,15 @@ async function editPost(req, res, next) {
         const user = req.user;
         const { content } = req.body;
 
-        if (!isUUID(id)) return res.status(400).json({ error: "Invalid Post ID" });
-        if (!id) return res.status(400).json({ error: "Post ID is required" });
-        if (!content) return res.status(400).json({ error: "Content is required" });
+        if (!isUUID(id)) {
+            return res.status(400).json({ error: "Invalid Post ID" });
+        }
+
+        if (typeof content !== "string" || !content.trim()) {
+            return res.status(400).json({ error: "Content is required" });
+        }
 
         const trimmedContent = content.trim();
-
-        if (!trimmedContent) return res.status(400).json({ error: "Content is required" });
 
         const post = await prisma.post.findFirst({
             where: {
@@ -96,33 +98,74 @@ async function editPost(req, res, next) {
             select: {
                 id: true,
                 content: true,
-                created_at: true,
-                user: {
-                    select: {
-                        id: true,
-                        username: true,
-                        first_name: true,
-                        last_name: true,
-                        created_at: true,
-                        profile_picture_url: true,
-                    },
-                },
             },
         });
 
-        if (!post) return res.status(404).json({ error: "Post not found" });
-        if (post.content === trimmedContent) return res.status(400).json({ error: "No changes were made" });
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        if (post.content === trimmedContent) {
+            return res.status(400).json({ error: "No changes were made" });
+        }
 
         const updatedPost = await prisma.post.update({
             where: {
                 id: post.id,
             },
             data: {
-                content: trimmedContent
-            }
+                content: trimmedContent,
+            },
+            select: {
+                id: true,
+                content: true,
+                created_at: true,
+                updated_at: true,
+                user_id: true,
+
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        postLikes: true,
+                        comments: true,
+                    },
+                },
+
+                postLikes: {
+                    where: {
+                        user_id: user.id,
+                    },
+                    select: {
+                        id: true,
+                    },
+                },
+            },
         });
 
-        return res.status(200).json({ updatedPost });
+        const formattedPost = {
+            id: updatedPost.id,
+            user_id: updatedPost.user_id,
+            content: updatedPost.content,
+            created_at: updatedPost.created_at,
+            updated_at: updatedPost.updated_at,
+            user: updatedPost.user,
+            likeCount: updatedPost._count.postLikes,
+            likedByMe: updatedPost.postLikes.length > 0,
+            commentCount: updatedPost._count.comments,
+        };
+
+        return res.status(200).json({
+            post: formattedPost,
+        });
     } catch (error) {
         return next(error);
     }
