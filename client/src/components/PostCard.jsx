@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 import styles from './styles/PostCard.module.css';
+
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import OptionsMenu from './OptionsMenu';
 import DeletePost from './DeletePost';
+import EditPostModal from './EditPostModal';
 
-const PostCard = ({ post, onPostDeleted }) => {
+const PostCard = ({ post, onPostDeleted, onPostEdited }) => {
   const [viewComments, setViewComments] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const { user } = useAuthContext();
 
@@ -15,9 +18,7 @@ const PostCard = ({ post, onPostDeleted }) => {
     setViewComments((prev) => !prev);
   };
 
-  const userOwnsPost = () => {
-    return user.id === post.user_id;
-  };
+  const userOwnsPost = user.id === post.user_id;
 
   return (
     <article className={styles.card}>
@@ -37,8 +38,11 @@ const PostCard = ({ post, onPostDeleted }) => {
           <div className={styles.timestamp}>{post.updated_at}</div>
         </div>
 
-        {userOwnsPost() && (
+        {userOwnsPost && (
           <OptionsMenu>
+            <button type="button" onClick={() => setShowEditModal(true)}>
+              Edit post
+            </button>
             <DeletePost post={post} onPostDeleted={onPostDeleted} />
           </OptionsMenu>
         )}
@@ -61,6 +65,14 @@ const PostCard = ({ post, onPostDeleted }) => {
         />
       </div>
       {viewComments && <CommentSection postId={post.id} />}
+
+      {showEditModal && (
+        <EditPostModal
+          post={post}
+          onClose={() => setShowEditModal(false)}
+          onPostEdited={onPostEdited}
+        />
+      )}
     </article>
   );
 };
