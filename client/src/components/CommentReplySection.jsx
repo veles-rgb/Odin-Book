@@ -54,6 +54,11 @@ const CommentReplySection = ({ commentId, refreshKey }) => {
               onReplyCreated={(newReply) => {
                 setReplies((prev) => [...prev, newReply]);
               }}
+              onReplyDeleted={(deletedComment) => {
+                setReplies((prev) =>
+                  prev.filter((reply) => reply.id != deletedComment),
+                );
+              }}
             />
           ))}
         </div>
