@@ -1,0 +1,13 @@
+.postPage {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.error {
+    color: #dc2626;
+}
+
+.loading {
+    color: #6b7280;
+}
