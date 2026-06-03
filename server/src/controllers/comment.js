@@ -27,6 +27,7 @@ async function createComment(req, res, next) {
             },
             select: {
                 id: true,
+                user_id: true,
                 post_id: true,
                 created_at: true,
                 content: true,
