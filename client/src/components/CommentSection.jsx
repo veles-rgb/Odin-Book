@@ -105,7 +105,15 @@ const CommentSection = ({ postId }) => {
       {!isLoading && comments.length > 0 && (
         <div className={styles.commentList}>
           {comments.map((comment) => (
-            <Comment comment={comment} key={comment.id} />
+            <Comment
+              comment={comment}
+              key={comment.id}
+              onCommentDelete={(deletedComment) => {
+                setComments((prev) =>
+                  prev.filter((comment) => comment.id != deletedComment),
+                );
+              }}
+            />
           ))}
         </div>
       )}
