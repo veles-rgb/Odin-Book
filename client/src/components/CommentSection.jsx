@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
 import Comment from './Comment';
-import styles from './CommentSection.module.css';
+import styles from './styles/CommentSection.module.css';
 
 const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([]);

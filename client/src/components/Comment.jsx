@@ -1,4 +1,4 @@
-import styles from './Comment.module.css';
+import styles from './styles/Comment.module.css';
 import { useState } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';

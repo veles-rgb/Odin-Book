@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import styles from './OptionsMenu.module.css';
+import styles from './styles/OptionsMenu.module.css';
 import { HiDotsVertical } from 'react-icons/hi';
 
 const OptionsMenu = ({ className = '', children }) => {

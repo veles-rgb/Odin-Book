@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
-import styles from './CommentReplySection.module.css';
+import styles from './styles/CommentReplySection.module.css';
 import CommentReply from './CommentReply';
 
 const CommentReplySection = ({ commentId, refreshKey }) => {

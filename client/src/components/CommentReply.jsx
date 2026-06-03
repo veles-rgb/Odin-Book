@@ -1,4 +1,4 @@
-import styles from './CommentReply.module.css';
+import styles from './styles/CommentReply.module.css';
 import { useState } from 'react';
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';

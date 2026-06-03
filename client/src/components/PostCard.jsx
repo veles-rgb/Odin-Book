@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
-import styles from './PostCard.module.css';
+import styles from './styles/PostCard.module.css';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import OptionsMenu from './OptionsMenu';
