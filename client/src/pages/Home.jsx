@@ -90,7 +90,15 @@ const Home = () => {
 
       <div className={styles.postsContainer}>
         {posts.map((post) => (
-          <PostCard post={post} key={post.id} />
+          <PostCard
+            post={post}
+            key={post.id}
+            onPostDeleted={(deletedPostId) => {
+              setPosts((prev) =>
+                prev.filter((post) => post.id !== deletedPostId),
+              );
+            }}
+          />
         ))}
       </div>
 
