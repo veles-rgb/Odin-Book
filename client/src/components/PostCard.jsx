@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import styles from './PostCard.module.css';
 import LikeButton from './LikeButton';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 import CommentSection from './CommentSection';
+import OptionsMenu from './OptionsMenu';
 
 const PostCard = ({ post }) => {
   const [viewComments, setViewComments] = useState(false);
 
+  const { user } = useAuthContext();
+
   const HandleShowComments = () => {
     setViewComments((prev) => !prev);
+  };
+
+  const userOwnsPost = () => {
+    return user.id === post.user_id;
   };
 
   return (
@@ -28,6 +36,13 @@ const PostCard = ({ post }) => {
 
           <div className={styles.timestamp}>{post.updated_at}</div>
         </div>
+
+        {userOwnsPost() && (
+          <OptionsMenu className={styles.dropdown}>
+            <div>Test</div>
+            <div>Test</div>
+          </OptionsMenu>
+        )}
       </div>
 
       <div className={styles.content}>{post.content}</div>
