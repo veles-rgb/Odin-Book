@@ -6,8 +6,9 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import OptionsMenu from './OptionsMenu';
 import CommentReplySection from './CommentReplySection';
 import LikeButton from './LikeButton';
+import DeleteComment from './DeleteComment';
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, onCommentDelete }) => {
   const { user } = useAuthContext();
   const [viewReplies, setViewReplies] = useState(false);
   const [viewReplyBox, setViewReplyBox] = useState(false);
@@ -82,8 +83,10 @@ const Comment = ({ comment }) => {
 
         {userOwnsComment() && (
           <OptionsMenu>
-            <div>Test</div>
-            <div>Test</div>
+            <DeleteComment
+              onCommentDeleted={onCommentDelete}
+              comment={comment}
+            />
           </OptionsMenu>
         )}
       </div>
