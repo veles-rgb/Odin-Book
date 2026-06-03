@@ -7,11 +7,13 @@ import OptionsMenu from './OptionsMenu';
 import CommentReplySection from './CommentReplySection';
 import LikeButton from './LikeButton';
 import DeleteComment from './DeleteComment';
+import EditCommentModal from './EditCommentModal';
 
-const Comment = ({ comment, onCommentDelete }) => {
+const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   const { user } = useAuthContext();
   const [viewReplies, setViewReplies] = useState(false);
   const [viewReplyBox, setViewReplyBox] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const [userReply, setUserReply] = useState('');
   const [userReplyLoading, setUserReplyLoading] = useState(false);
@@ -21,9 +23,7 @@ const Comment = ({ comment, onCommentDelete }) => {
 
   const { apiFetch } = useApiFetch();
 
-  const userOwnsComment = () => {
-    return user.id === comment.user_id;
-  };
+  const userOwnsComment = user.id === comment.user_id;
 
   const handleViewReplies = () => {
     setViewReplies((prev) => !prev);
@@ -45,20 +45,21 @@ const Comment = ({ comment, onCommentDelete }) => {
         body: JSON.stringify({ content: userReply }),
       });
 
+      if (!response) return;
+
       const data = await response.json();
 
       if (!response.ok) {
         setUserReplyError(data.error);
+        return;
       }
 
       setUserReply('');
       setViewReplyBox(false);
       setViewReplies(true);
       setReplyRefreshKey((prev) => prev + 1);
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setUserReplyError('Something went wrong.');
-      return;
     } finally {
       setUserReplyLoading(false);
     }
@@ -81,8 +82,12 @@ const Comment = ({ comment, onCommentDelete }) => {
           <div className={styles.timestamp}>{comment.updated_at}</div>
         </div>
 
-        {userOwnsComment() && (
+        {userOwnsComment && (
           <OptionsMenu>
+            <button type="button" onClick={() => setShowEditModal(true)}>
+              Edit comment
+            </button>
+
             <DeleteComment
               onCommentDeleted={onCommentDelete}
               comment={comment}
@@ -102,7 +107,9 @@ const Comment = ({ comment, onCommentDelete }) => {
           </button>
         )}
 
-        <button onClick={handleViewReplyBox}>Reply</button>
+        <button type="button" onClick={handleViewReplyBox}>
+          Reply
+        </button>
 
         <LikeButton
           target="comment"
@@ -118,7 +125,8 @@ const Comment = ({ comment, onCommentDelete }) => {
             value={userReply}
             onChange={(e) => setUserReply(e.target.value)}
             placeholder="Type your reply..."
-          ></textarea>
+          />
+
           <button type="submit" disabled={userReplyLoading}>
             Send
           </button>
@@ -126,10 +134,19 @@ const Comment = ({ comment, onCommentDelete }) => {
           {userReplyError && <div>{userReplyError}</div>}
         </form>
       )}
+
       {viewReplies && (
         <CommentReplySection
           commentId={comment.id}
           refreshKey={replyRefreshKey}
+        />
+      )}
+
+      {showEditModal && (
+        <EditCommentModal
+          comment={comment}
+          onClose={() => setShowEditModal(false)}
+          onCommentEdited={onCommentEdited}
         />
       )}
     </article>

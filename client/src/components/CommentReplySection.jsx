@@ -28,8 +28,7 @@ const CommentReplySection = ({ commentId, refreshKey }) => {
         }
 
         setReplies(data.replies);
-        // eslint-disable-next-line no-unused-vars
-      } catch (error) {
+      } catch {
         setError('Something went wrong.');
       } finally {
         setIsLoading(false);
@@ -54,9 +53,16 @@ const CommentReplySection = ({ commentId, refreshKey }) => {
               onReplyCreated={(newReply) => {
                 setReplies((prev) => [...prev, newReply]);
               }}
-              onReplyDeleted={(deletedComment) => {
+              onReplyDeleted={(deletedCommentId) => {
                 setReplies((prev) =>
-                  prev.filter((reply) => reply.id != deletedComment),
+                  prev.filter((reply) => reply.id !== deletedCommentId),
+                );
+              }}
+              onReplyEdited={(updatedReply) => {
+                setReplies((prev) =>
+                  prev.map((reply) =>
+                    reply.id === updatedReply.id ? updatedReply : reply,
+                  ),
                 );
               }}
             />

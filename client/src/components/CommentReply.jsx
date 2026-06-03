@@ -6,19 +6,25 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import LikeButton from './LikeButton';
 import OptionsMenu from './OptionsMenu';
 import DeleteComment from './DeleteComment';
+import EditCommentModal from './EditCommentModal';
 
-const CommentReply = ({ comment, onReplyCreated, onReplyDeleted }) => {
+const CommentReply = ({
+  comment,
+  onReplyCreated,
+  onReplyDeleted,
+  onReplyEdited,
+}) => {
   const { user } = useAuthContext();
   const [showReply, setShowReply] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const [userReply, setUserReply] = useState('');
   const [userReplyLoading, setUserReplyLoading] = useState(false);
   const [userReplyError, setUserReplyError] = useState(null);
 
   const { apiFetch } = useApiFetch();
 
-  const userOwnsReply = () => {
-    return user.id === comment.user_id;
-  };
+  const userOwnsReply = user.id === comment.user_id;
 
   const handleShowReply = () => {
     setShowReply((prev) => !prev);
@@ -51,8 +57,7 @@ const CommentReply = ({ comment, onReplyCreated, onReplyDeleted }) => {
       setShowReply(false);
 
       onReplyCreated?.(data.comment);
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setUserReplyError('Something went wrong.');
     } finally {
       setUserReplyLoading(false);
@@ -76,8 +81,12 @@ const CommentReply = ({ comment, onReplyCreated, onReplyDeleted }) => {
           <div className={styles.timestamp}>{comment.updated_at}</div>
         </div>
 
-        {userOwnsReply() && (
+        {userOwnsReply && (
           <OptionsMenu>
+            <button type="button" onClick={() => setShowEditModal(true)}>
+              Edit comment
+            </button>
+
             <DeleteComment
               comment={comment}
               onCommentDeleted={onReplyDeleted}
@@ -136,6 +145,14 @@ const CommentReply = ({ comment, onReplyCreated, onReplyDeleted }) => {
             )}
           </form>
         </div>
+      )}
+
+      {showEditModal && (
+        <EditCommentModal
+          comment={comment}
+          onClose={() => setShowEditModal(false)}
+          onCommentEdited={onReplyEdited}
+        />
       )}
     </article>
   );

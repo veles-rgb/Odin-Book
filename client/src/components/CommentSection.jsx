@@ -32,8 +32,7 @@ const CommentSection = ({ postId }) => {
         }
 
         setComments(data.comments);
-        // eslint-disable-next-line no-unused-vars
-      } catch (error) {
+      } catch {
         setError('Something went wrong.');
       } finally {
         setIsLoading(false);
@@ -67,10 +66,8 @@ const CommentSection = ({ postId }) => {
 
       setComments((prev) => [...prev, data.comment]);
       setUserComment('');
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setUserCommentError('Something went wrong');
-      return;
     } finally {
       setUserCommentLoading(false);
     }
@@ -87,16 +84,19 @@ const CommentSection = ({ postId }) => {
         <div>
           <form onSubmit={handleSubmitComment}>
             <label>Leave a comment</label>
+
             <textarea
               name="comment"
               id="comment"
               placeholder="Say something..."
               value={userComment}
               onChange={(e) => setUserComment(e.target.value)}
-            ></textarea>
+            />
+
             <button type="submit" disabled={userCommentLoading}>
               Send
             </button>
+
             {userCommentError && <div>{userCommentError}</div>}
           </form>
         </div>
@@ -108,9 +108,16 @@ const CommentSection = ({ postId }) => {
             <Comment
               comment={comment}
               key={comment.id}
-              onCommentDelete={(deletedComment) => {
+              onCommentDelete={(deletedCommentId) => {
                 setComments((prev) =>
-                  prev.filter((comment) => comment.id != deletedComment),
+                  prev.filter((comment) => comment.id !== deletedCommentId),
+                );
+              }}
+              onCommentEdited={(updatedComment) => {
+                setComments((prev) =>
+                  prev.map((comment) =>
+                    comment.id === updatedComment.id ? updatedComment : comment,
+                  ),
                 );
               }}
             />
