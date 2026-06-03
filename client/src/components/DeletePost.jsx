@@ -14,6 +14,12 @@ const DeletePost = ({ post, onPostDeleted }) => {
       setIsLoading(true);
       setError(null);
 
+      const confirmed = window.confirm(
+        'Are you sure you want to delete this post?',
+      );
+
+      if (!confirmed) return;
+
       if (user.id !== post.user_id) {
         setError('You cannot delete this post.');
         return;
