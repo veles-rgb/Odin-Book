@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useApiFetch } from '../hooks/useApiFetch';
 
 const CreatePostModal = ({ onClose, onPostCreated }) => {
@@ -32,36 +33,42 @@ const CreatePostModal = ({ onClose, onPostCreated }) => {
       onPostCreated?.(data.post);
       setPostContent('');
       onClose();
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setPostError('Something went wrong.');
-      return;
     } finally {
       setPostIsLoading(false);
     }
   };
 
-  return (
-    <dialog open>
-      <form onSubmit={handlePostSubmit}>
-        <h3>Create a new post</h3>
+  return createPortal(
+    <>
+      <div className="modal-backdrop" onClick={onClose} />
 
-        <textarea
-          placeholder="What do you have in mind?"
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-        ></textarea>
+      <div className="modal">
+        <form onSubmit={handlePostSubmit}>
+          <h3>Create a new post</h3>
 
-        <button type="submit" disabled={postIsLoading}>
-          Post
-        </button>
-        <button type="button" disabled={postIsLoading} onClick={onClose}>
-          Cancel
-        </button>
+          <textarea
+            placeholder="What do you have in mind?"
+            value={postContent}
+            onChange={(e) => setPostContent(e.target.value)}
+          />
 
-        {postError && <div>{postError}</div>}
-      </form>
-    </dialog>
+          {postError && <div className="modal-error">{postError}</div>}
+
+          <div className="modal-actions">
+            <button type="submit" disabled={postIsLoading}>
+              {postIsLoading ? 'Posting...' : 'Post'}
+            </button>
+
+            <button type="button" disabled={postIsLoading} onClick={onClose}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </>,
+    document.body,
   );
 };
 
