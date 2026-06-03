@@ -62,19 +62,13 @@ async function editComment(req, res, next) {
             });
         }
 
-        if (!content) {
+        if (typeof content !== "string" || !content.trim()) {
             return res.status(400).json({
                 error: "Comment cannot be blank.",
             });
         }
 
         const trimmedContent = content.trim();
-
-        if (!trimmedContent) {
-            return res.status(400).json({
-                error: "Comment cannot be blank.",
-            });
-        }
 
         const comment = await prisma.comment.findFirst({
             where: {
@@ -107,24 +101,68 @@ async function editComment(req, res, next) {
             },
             select: {
                 id: true,
-                parent_id: true,
                 post_id: true,
+                parent_id: true,
                 user_id: true,
+                replying_to_user_id: true,
                 content: true,
                 created_at: true,
+                updated_at: true,
+
                 user: {
                     select: {
                         id: true,
+                        username: true,
                         first_name: true,
                         last_name: true,
-                        username: true,
                         profile_picture_url: true,
+                    },
+                },
+
+                replyingToUser: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        commentLikes: true,
+                        comments: true,
+                    },
+                },
+
+                commentLikes: {
+                    where: {
+                        user_id: user.id,
+                    },
+                    select: {
+                        id: true,
                     },
                 },
             },
         });
 
-        return res.status(200).json({ updatedComment });
+        const formattedComment = {
+            id: updatedComment.id,
+            post_id: updatedComment.post_id,
+            parent_id: updatedComment.parent_id,
+            user_id: updatedComment.user_id,
+            replying_to_user_id: updatedComment.replying_to_user_id,
+            content: updatedComment.content,
+            created_at: updatedComment.created_at,
+            updated_at: updatedComment.updated_at,
+            user: updatedComment.user,
+            replyingToUser: updatedComment.replyingToUser,
+            likeCount: updatedComment._count.commentLikes,
+            likedByMe: updatedComment.commentLikes.length > 0,
+            replyCount: updatedComment._count.comments,
+        };
+
+        return res.status(200).json({
+            comment: formattedComment,
+        });
 
     } catch (error) {
         return next(error);
