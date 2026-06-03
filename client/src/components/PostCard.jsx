@@ -1,12 +1,12 @@
 import { useState } from 'react';
+import { useAuthContext } from '../hooks/useAuthContext';
 import styles from './PostCard.module.css';
 import LikeButton from './LikeButton';
-import { useAuthContext } from '../hooks/useAuthContext';
-
 import CommentSection from './CommentSection';
 import OptionsMenu from './OptionsMenu';
+import DeletePost from './DeletePost';
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onPostDeleted }) => {
   const [viewComments, setViewComments] = useState(false);
 
   const { user } = useAuthContext();
@@ -39,8 +39,7 @@ const PostCard = ({ post }) => {
 
         {userOwnsPost() && (
           <OptionsMenu>
-            <div>Test</div>
-            <div>Test</div>
+            <DeletePost post={post} onPostDeleted={onPostDeleted} />
           </OptionsMenu>
         )}
       </div>
