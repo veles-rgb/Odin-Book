@@ -98,6 +98,13 @@ const Home = () => {
                 prev.filter((post) => post.id !== deletedPostId),
               );
             }}
+            onPostEdited={(updatedPost) => {
+              setPosts((prev) =>
+                prev.map((post) =>
+                  post.id === updatedPost.id ? updatedPost : post,
+                ),
+              );
+            }}
           />
         ))}
       </div>
