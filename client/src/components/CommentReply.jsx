@@ -84,7 +84,7 @@ const CommentReply = ({
         {userOwnsReply && (
           <OptionsMenu>
             <button type="button" onClick={() => setShowEditModal(true)}>
-              Edit comment
+              Edit
             </button>
 
             <DeleteComment

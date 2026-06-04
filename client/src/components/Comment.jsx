@@ -85,7 +85,7 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
         {userOwnsComment && (
           <OptionsMenu>
             <button type="button" onClick={() => setShowEditModal(true)}>
-              Edit comment
+              Edit
             </button>
 
             <DeleteComment

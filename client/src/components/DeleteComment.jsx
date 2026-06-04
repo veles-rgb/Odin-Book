@@ -44,7 +44,7 @@ const DeleteComment = ({ comment, onCommentDeleted }) => {
   return (
     <>
       <button type="button" onClick={deleteComment} disabled={isLoading}>
-        {isLoading ? 'Deleting...' : 'Delete comment'}
+        {isLoading ? 'Deleting...' : 'Delete'}
       </button>
 
       {error && <div>{error}</div>}

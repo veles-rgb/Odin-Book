@@ -50,7 +50,7 @@ const DeletePost = ({ post, onPostDeleted }) => {
   return (
     <>
       <button type="button" onClick={deletePost} disabled={isLoading}>
-        {isLoading ? 'Deleting...' : 'Delete post'}
+        {isLoading ? 'Deleting...' : 'Delete'}
       </button>
 
       {error && <div>{error}</div>}
