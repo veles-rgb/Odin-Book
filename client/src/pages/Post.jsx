@@ -56,6 +56,7 @@ const Post = () => {
           onPostEdited={(updatedPost) => {
             setPost(updatedPost);
           }}
+          showViewPostOption={false}
         />
       )}
     </main>
