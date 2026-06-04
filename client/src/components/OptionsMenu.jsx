@@ -1,10 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Children } from 'react';
 import styles from './styles/OptionsMenu.module.css';
 import { HiDotsVertical } from 'react-icons/hi';
 
 const OptionsMenu = ({ className = '', children }) => {
   const menuRef = useRef(null);
   const [showMenu, setShowMenu] = useState(false);
+
+  const validChildren = Children.toArray(children).filter(Boolean);
+  const hasChildren = validChildren.length > 0;
 
   const handleClick = () => {
     setShowMenu((prev) => !prev);
@@ -14,7 +17,7 @@ const OptionsMenu = ({ className = '', children }) => {
     if (!showMenu) return;
 
     const handleOutsideClick = (e) => {
-      if (showMenu && !menuRef.current?.contains(e.target)) {
+      if (!menuRef.current?.contains(e.target)) {
         setShowMenu(false);
       }
     };
@@ -26,6 +29,8 @@ const OptionsMenu = ({ className = '', children }) => {
     };
   }, [showMenu]);
 
+  if (!hasChildren) return null;
+
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <button type="button" className={styles.trigger} onClick={handleClick}>
@@ -34,7 +39,7 @@ const OptionsMenu = ({ className = '', children }) => {
 
       {showMenu && (
         <div ref={menuRef} className={styles.menu}>
-          {children}
+          {validChildren}
         </div>
       )}
     </div>
