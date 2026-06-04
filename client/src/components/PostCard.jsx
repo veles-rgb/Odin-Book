@@ -52,9 +52,11 @@ const PostCard = ({ post, onPostDeleted, onPostEdited }) => {
 
       <div className={styles.footer}>
         <button className={styles.commentsButton} onClick={HandleShowComments}>
-          {post.commentCount > 0
-            ? `View comments (${post.commentCount})`
-            : 'Add comment'}
+          {viewComments
+            ? 'Hide comments'
+            : post.commentCount > 0
+              ? `View comments (${post.commentCount})`
+              : 'Add comment'}
         </button>
 
         <LikeButton
