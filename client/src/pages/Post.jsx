@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useApiFetch } from '../hooks/useApiFetch';
 import PostCard from '../components/PostCard';
 
@@ -12,6 +12,7 @@ const Post = () => {
   const [error, setError] = useState(null);
 
   const { apiFetch } = useApiFetch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getPost = async () => {
@@ -48,7 +49,15 @@ const Post = () => {
 
       {isLoading && <div className={styles.loading}>Loading post...</div>}
 
-      {!isLoading && post && <PostCard post={post} />}
+      {!isLoading && post && (
+        <PostCard
+          post={post}
+          onPostDeleted={() => navigate('/')}
+          onPostEdited={(updatedPost) => {
+            setPost(updatedPost);
+          }}
+        />
+      )}
     </main>
   );
 };
