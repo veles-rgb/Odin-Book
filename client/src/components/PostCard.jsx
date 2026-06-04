@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import styles from './styles/PostCard.module.css';
+import { FaRegClock } from 'react-icons/fa';
 
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import OptionsMenu from './OptionsMenu';
 import DeletePost from './DeletePost';
 import EditPostModal from './EditPostModal';
+import Tooltip from './Tooltip';
+
+import { formatDateTime } from '../utils/formatDateTime';
 
 const PostCard = ({
   post,
@@ -26,6 +30,7 @@ const PostCard = ({
   };
 
   const userOwnsPost = user.id === post.user_id;
+  const postHasBeenUpdated = post.created_at !== post.updated_at;
 
   return (
     <article className={styles.card}>
@@ -42,7 +47,16 @@ const PostCard = ({
         <div className={styles.userInfo}>
           <div className={styles.username}>{post.user.username}</div>
 
-          <div className={styles.timestamp}>{post.updated_at}</div>
+          <div className={styles.dateTimeContainer}>
+            <div className={styles.timestamp}>
+              {formatDateTime(post.created_at)}
+            </div>
+            {postHasBeenUpdated && (
+              <Tooltip content={`Updated: ${formatDateTime(post.updated_at)}`}>
+                <FaRegClock />
+              </Tooltip>
+            )}
+          </div>
         </div>
 
         <OptionsMenu>

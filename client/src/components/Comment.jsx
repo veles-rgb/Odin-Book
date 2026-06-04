@@ -9,6 +9,10 @@ import LikeButton from './LikeButton';
 import DeleteComment from './DeleteComment';
 import EditCommentModal from './EditCommentModal';
 
+import Tooltip from './Tooltip';
+import { FaRegClock } from 'react-icons/fa';
+import { formatDateTime } from '../utils/formatDateTime';
+
 const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   const { user } = useAuthContext();
   const [viewReplies, setViewReplies] = useState(false);
@@ -24,6 +28,7 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   const { apiFetch } = useApiFetch();
 
   const userOwnsComment = user.id === comment.user_id;
+  const commentHasBeenUpdated = comment.created_at !== comment.updated_at;
 
   const handleViewReplies = () => {
     setViewReplies((prev) => !prev);
@@ -79,7 +84,20 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
 
         <div className={styles.userInfo}>
           <div className={styles.username}>{comment.user.username}</div>
-          <div className={styles.timestamp}>{comment.updated_at}</div>
+
+          <div className={styles.dateTimeContainer}>
+            <div className={styles.timestamp}>
+              {formatDateTime(comment.created_at)}
+            </div>
+
+            {commentHasBeenUpdated && (
+              <Tooltip
+                content={`Updated: ${formatDateTime(comment.updated_at)}`}
+              >
+                <FaRegClock />
+              </Tooltip>
+            )}
+          </div>
         </div>
 
         {userOwnsComment && (
