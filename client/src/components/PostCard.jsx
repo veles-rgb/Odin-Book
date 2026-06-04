@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import styles from './styles/PostCard.module.css';
 
@@ -8,11 +9,17 @@ import OptionsMenu from './OptionsMenu';
 import DeletePost from './DeletePost';
 import EditPostModal from './EditPostModal';
 
-const PostCard = ({ post, onPostDeleted, onPostEdited }) => {
+const PostCard = ({
+  post,
+  onPostDeleted,
+  onPostEdited,
+  showViewPostOption = true,
+}) => {
   const [viewComments, setViewComments] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   const HandleShowComments = () => {
     setViewComments((prev) => !prev);
@@ -38,14 +45,23 @@ const PostCard = ({ post, onPostDeleted, onPostEdited }) => {
           <div className={styles.timestamp}>{post.updated_at}</div>
         </div>
 
-        {userOwnsPost && (
-          <OptionsMenu>
-            <button type="button" onClick={() => setShowEditModal(true)}>
-              Edit post
+        <OptionsMenu>
+          {showViewPostOption && (
+            <button type="button" onClick={() => navigate(`/post/${post.id}`)}>
+              View
             </button>
-            <DeletePost post={post} onPostDeleted={onPostDeleted} />
-          </OptionsMenu>
-        )}
+          )}
+
+          {userOwnsPost && (
+            <>
+              <button type="button" onClick={() => setShowEditModal(true)}>
+                Edit
+              </button>
+
+              <DeletePost post={post} onPostDeleted={onPostDeleted} />
+            </>
+          )}
+        </OptionsMenu>
       </div>
 
       <div className={styles.content}>{post.content}</div>
