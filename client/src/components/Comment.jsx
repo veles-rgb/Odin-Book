@@ -73,17 +73,21 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   return (
     <article className={styles.comment}>
       <div className={styles.header}>
-        <img
-          className={styles.avatar}
-          src={
-            comment.user.profile_picture_url ||
-            'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
-          }
-          alt={`${comment.user.username}'s profile picture`}
-        />
+        <a href={`/profile/${user.id}`}>
+          <img
+            className={styles.avatar}
+            src={
+              comment.user.profile_picture_url ||
+              'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
+            }
+            alt={`${comment.user.username}'s profile picture`}
+          />
+        </a>
 
         <div className={styles.userInfo}>
-          <div className={styles.username}>{comment.user.username}</div>
+          <a href={`/profile/${user.id}`}>
+            <div className={styles.username}>{comment.user.username}</div>
+          </a>
 
           <div className={styles.dateTimeContainer}>
             <div className={styles.timestamp}>
