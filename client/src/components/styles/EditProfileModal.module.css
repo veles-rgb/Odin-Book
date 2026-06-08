@@ -1,0 +1,30 @@
+.editProfileModal {
+    width: min(90vw, 520px);
+}
+
+.avatarPreviewWrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.avatarPreview {
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid #e5e7eb;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.fieldGroup label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
