@@ -1,24 +1,65 @@
 const { prisma } = require('../../lib/prisma.mjs');
-const { validate: isUUID } = require("uuid");
+const { validate: isUUID } = require('uuid');
+
+async function findUserByIdentifier(identifier) {
+    if (isUUID(identifier)) {
+        return prisma.user.findUnique({
+            where: {
+                id: identifier,
+            },
+        });
+    }
+
+    return prisma.user.findUnique({
+        where: {
+            username: identifier,
+        },
+    });
+}
+
+async function findIncomingFollowRequest(identifier, currentUserId) {
+    if (isUUID(identifier)) {
+        const requestById = await prisma.followRequest.findFirst({
+            where: {
+                id: identifier,
+                receiver_id: currentUserId,
+            },
+        });
+
+        if (requestById) {
+            return requestById;
+        }
+    }
+
+    const requester = await findUserByIdentifier(identifier);
+
+    if (!requester) {
+        return null;
+    }
+
+    return prisma.followRequest.findFirst({
+        where: {
+            requester_id: requester.id,
+            receiver_id: currentUserId,
+        },
+    });
+}
 
 async function sendFollowRequest(req, res, next) {
     try {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) return res.status(400).json({ error: "Invalid user ID." });
+        const requestedUser = await findUserByIdentifier(id);
 
-        const requestedUser = await prisma.user.findFirst({
-            where: {
-                id,
-            },
-        });
+        if (!requestedUser) {
+            return res.status(404).json({ error: 'That user does not exist.' });
+        }
 
-        if (!requestedUser) return res.status(404).json({ error: "That user does not exist." });
+        if (requestedUser.id === user.id) {
+            return res.status(400).json({ error: 'You cannot follow yourself.' });
+        }
 
-        if (requestedUser.id === user.id) return res.status(400).json({ error: "You cannot follow yourself." });
-
-        // Check if already requested or following
         const checkAlreadyFollowing = await prisma.follow.findFirst({
             where: {
                 follower_id: user.id,
@@ -26,7 +67,9 @@ async function sendFollowRequest(req, res, next) {
             },
         });
 
-        if (checkAlreadyFollowing) return res.status(409).json({ error: "You already follow this user." });
+        if (checkAlreadyFollowing) {
+            return res.status(409).json({ error: 'You already follow this user.' });
+        }
 
         const checkAlreadyRequested = await prisma.followRequest.findFirst({
             where: {
@@ -35,7 +78,11 @@ async function sendFollowRequest(req, res, next) {
             },
         });
 
-        if (checkAlreadyRequested) return res.status(409).json({ error: "You already requested to follow this user." });
+        if (checkAlreadyRequested) {
+            return res.status(409).json({
+                error: 'You already requested to follow this user.',
+            });
+        }
 
         const followRequest = await prisma.followRequest.create({
             data: {
@@ -46,9 +93,9 @@ async function sendFollowRequest(req, res, next) {
 
         return res.status(201).json({ follow_request: followRequest });
     } catch (error) {
-        if (error.code === "P2002") {
+        if (error.code === 'P2002') {
             return res.status(409).json({
-                error: "You already requested to follow this user.",
+                error: 'You already requested to follow this user.',
             });
         }
 
@@ -61,22 +108,22 @@ async function cancelFollowRequest(req, res, next) {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({
-                error: "Invalid user ID.",
-            });
+        const requestedUser = await findUserByIdentifier(id);
+
+        if (!requestedUser) {
+            return res.status(404).json({ error: 'That user does not exist.' });
         }
 
         const followRequest = await prisma.followRequest.findFirst({
             where: {
                 requester_id: user.id,
-                receiver_id: id,
+                receiver_id: requestedUser.id,
             },
         });
 
         if (!followRequest) {
             return res.status(404).json({
-                error: "That follow request does not exist.",
+                error: 'That follow request does not exist.',
             });
         }
 
@@ -87,9 +134,8 @@ async function cancelFollowRequest(req, res, next) {
         });
 
         return res.status(200).json({
-            message: "Follow request cancelled.",
+            message: 'Follow request cancelled.',
         });
-
     } catch (error) {
         return next(error);
     }
@@ -100,22 +146,11 @@ async function acceptFollowRequest(req, res, next) {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({
-                error: "Invalid follow request ID.",
-            });
-        }
-
-        const followRequest = await prisma.followRequest.findFirst({
-            where: {
-                id,
-                receiver_id: user.id,
-            },
-        });
+        const followRequest = await findIncomingFollowRequest(id, user.id);
 
         if (!followRequest) {
             return res.status(404).json({
-                error: "That follow request does not exist.",
+                error: 'That follow request does not exist.',
             });
         }
 
@@ -135,13 +170,12 @@ async function acceptFollowRequest(req, res, next) {
         ]);
 
         return res.status(200).json({
-            message: "Follow request accepted.",
+            message: 'Follow request accepted.',
         });
-
     } catch (error) {
-        if (error.code === "P2002") {
+        if (error.code === 'P2002') {
             return res.status(409).json({
-                error: "You already follow this user.",
+                error: 'You already follow this user.',
             });
         }
 
@@ -154,22 +188,11 @@ async function rejectFollowRequest(req, res, next) {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({
-                error: "Invalid follow request ID.",
-            });
-        }
-
-        const followRequest = await prisma.followRequest.findFirst({
-            where: {
-                id,
-                receiver_id: user.id,
-            },
-        });
+        const followRequest = await findIncomingFollowRequest(id, user.id);
 
         if (!followRequest) {
             return res.status(404).json({
-                error: "That follow request does not exist.",
+                error: 'That follow request does not exist.',
             });
         }
 
@@ -180,9 +203,8 @@ async function rejectFollowRequest(req, res, next) {
         });
 
         return res.status(200).json({
-            message: "Follow request rejected.",
+            message: 'Follow request rejected.',
         });
-
     } catch (error) {
         return next(error);
     }
@@ -196,11 +218,9 @@ async function getReceivedFollowRequests(req, res, next) {
             where: {
                 receiver_id: user.id,
             },
-
             orderBy: {
-                created_at: "desc",
+                created_at: 'desc',
             },
-
             select: {
                 id: true,
                 created_at: true,
@@ -220,7 +240,6 @@ async function getReceivedFollowRequests(req, res, next) {
         return res.status(200).json({
             received_follow_requests: receivedFollowRequests,
         });
-
     } catch (error) {
         return next(error);
     }
@@ -234,11 +253,9 @@ async function getSentFollowRequests(req, res, next) {
             where: {
                 requester_id: user.id,
             },
-
             orderBy: {
-                created_at: "desc",
+                created_at: 'desc',
             },
-
             select: {
                 id: true,
                 created_at: true,
@@ -258,7 +275,6 @@ async function getSentFollowRequests(req, res, next) {
         return res.status(200).json({
             sent_follow_requests: sentFollowRequests,
         });
-
     } catch (error) {
         return next(error);
     }
@@ -269,19 +285,23 @@ async function unfollowUser(req, res, next) {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({ error: "Invalid user ID." });
+        const userToUnfollow = await findUserByIdentifier(id);
+
+        if (!userToUnfollow) {
+            return res.status(404).json({ error: 'That user does not exist.' });
         }
 
         const follow = await prisma.follow.findFirst({
             where: {
                 follower_id: user.id,
-                following_id: id,
+                following_id: userToUnfollow.id,
             },
         });
 
         if (!follow) {
-            return res.status(404).json({ error: "You are not following this user." });
+            return res.status(404).json({
+                error: 'You are not following this user.',
+            });
         }
 
         await prisma.follow.delete({
@@ -290,7 +310,7 @@ async function unfollowUser(req, res, next) {
             },
         });
 
-        return res.status(200).json({ message: "Unfollowed successfully." });
+        return res.status(200).json({ message: 'Unfollowed successfully.' });
     } catch (error) {
         return next(error);
     }
@@ -301,19 +321,23 @@ async function removeFollower(req, res, next) {
         const user = req.user;
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({ error: "Invalid user ID." });
+        const followerToRemove = await findUserByIdentifier(id);
+
+        if (!followerToRemove) {
+            return res.status(404).json({ error: 'That user does not exist.' });
         }
 
         const follow = await prisma.follow.findFirst({
             where: {
                 following_id: user.id,
-                follower_id: id,
+                follower_id: followerToRemove.id,
             },
         });
 
         if (!follow) {
-            return res.status(404).json({ message: "That user is not following you." });
+            return res.status(404).json({
+                error: 'That user is not following you.',
+            });
         }
 
         await prisma.follow.delete({
@@ -322,7 +346,7 @@ async function removeFollower(req, res, next) {
             },
         });
 
-        return res.status(200).json({ message: "Removed follower." });
+        return res.status(200).json({ message: 'Removed follower.' });
     } catch (error) {
         return next(error);
     }
@@ -332,23 +356,32 @@ async function getFollowers(req, res, next) {
     try {
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({ error: "Invalid user ID." });
-        }
+        const profileUser = await findUserByIdentifier(id);
 
-        const user = await prisma.user.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ error: "That user does not exist." });
+        if (!profileUser) {
+            return res.status(404).json({ error: 'That user does not exist.' });
         }
 
         const followers = await prisma.follow.findMany({
             where: {
-                following_id: user.id,
+                following_id: profileUser.id,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+            select: {
+                id: true,
+                created_at: true,
+
+                follower: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
             },
         });
 
@@ -362,23 +395,32 @@ async function getFollowing(req, res, next) {
     try {
         const { id } = req.params;
 
-        if (!isUUID(id)) {
-            return res.status(400).json({ error: "Invalid user ID." });
-        }
+        const profileUser = await findUserByIdentifier(id);
 
-        const user = await prisma.user.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ error: "That user does not exist." });
+        if (!profileUser) {
+            return res.status(404).json({ error: 'That user does not exist.' });
         }
 
         const following = await prisma.follow.findMany({
             where: {
-                follower_id: user.id,
+                follower_id: profileUser.id,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+            select: {
+                id: true,
+                created_at: true,
+
+                following: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
             },
         });
 
@@ -402,5 +444,5 @@ module.exports = {
     removeFollower,
 
     getFollowers,
-    getFollowing
+    getFollowing,
 };
