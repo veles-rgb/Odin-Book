@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Post from './pages/Post';
+import Profile from './pages/Profile';
 
 function App() {
   const { user } = useAuthContext();
@@ -34,6 +35,10 @@ function App() {
           <Route
             path="/post/:postId"
             element={user ? <Post /> : <Navigate to={'/login'} />}
+          />
+          <Route
+            path="/profile/:identifier"
+            element={user ? <Profile /> : <Navigate to={'/login'} />}
           />
         </Routes>
       </BrowserRouter>
