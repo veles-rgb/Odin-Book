@@ -7,33 +7,35 @@ async function getUser(req, res, next) {
         const { identifier } = req.params;
         let profileUser;
 
+        const userSelect = {
+            id: true,
+            username: true,
+            first_name: true,
+            last_name: true,
+            profile_picture_url: true,
+            created_at: true,
+
+            _count: {
+                select: {
+                    followers: true,
+                    following: true,
+                },
+            },
+        };
+
         if (isUUID(identifier)) {
             profileUser = await prisma.user.findUnique({
                 where: {
                     id: identifier,
                 },
-                select: {
-                    id: true,
-                    username: true,
-                    first_name: true,
-                    last_name: true,
-                    profile_picture_url: true,
-                    created_at: true,
-                }
+                select: userSelect,
             });
         } else {
             profileUser = await prisma.user.findUnique({
                 where: {
-                    username: identifier
+                    username: identifier,
                 },
-                select: {
-                    id: true,
-                    username: true,
-                    first_name: true,
-                    last_name: true,
-                    profile_picture_url: true,
-                    created_at: true,
-                }
+                select: userSelect,
             });
         }
 
@@ -49,13 +51,13 @@ async function getUser(req, res, next) {
                     OR: [
                         {
                             follower_id: user.id,
-                            following_id: profileUser.id
+                            following_id: profileUser.id,
                         },
                         {
                             follower_id: profileUser.id,
-                            following_id: user.id
+                            following_id: user.id,
                         },
-                    ]
+                    ],
                 },
             }),
 
@@ -64,44 +66,51 @@ async function getUser(req, res, next) {
                     OR: [
                         {
                             requester_id: user.id,
-                            receiver_id: profileUser.id
+                            receiver_id: profileUser.id,
                         },
                         {
                             requester_id: profileUser.id,
-                            receiver_id: user.id
+                            receiver_id: user.id,
                         },
                     ],
                 },
-            })
+            }),
         ]);
 
         const isFollowing = follows.some(
             (follow) =>
                 follow.follower_id === user.id &&
                 follow.following_id === profileUser.id
-
         );
 
         const isFollowedBy = follows.some(
             (follow) =>
                 follow.follower_id === profileUser.id &&
                 follow.following_id === user.id
-
         );
 
         const outgoingRequestPending = followRequests.some(
             (request) =>
                 request.requester_id === user.id &&
                 request.receiver_id === profileUser.id
-
         );
 
         const incomingRequestPending = followRequests.some(
             (request) =>
                 request.requester_id === profileUser.id &&
                 request.receiver_id === user.id
-
         );
+
+        const formattedProfileUser = {
+            id: profileUser.id,
+            username: profileUser.username,
+            first_name: profileUser.first_name,
+            last_name: profileUser.last_name,
+            profile_picture_url: profileUser.profile_picture_url,
+            created_at: profileUser.created_at,
+            followerCount: profileUser._count.followers,
+            followingCount: profileUser._count.following,
+        };
 
         const relationship = {
             isFollowing,
@@ -110,8 +119,10 @@ async function getUser(req, res, next) {
             incomingRequestPending,
         };
 
-        return res.status(200).json({ profileUser, relationship });
-
+        return res.status(200).json({
+            profileUser: formattedProfileUser,
+            relationship,
+        });
     } catch (error) {
         return next(error);
     }
