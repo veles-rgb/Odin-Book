@@ -73,7 +73,7 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   return (
     <article className={styles.comment}>
       <div className={styles.header}>
-        <a href={`/profile/${user.id}`}>
+        <a href={`/profile/${comment.user.id}`}>
           <img
             className={styles.avatar}
             src={
@@ -85,7 +85,7 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
         </a>
 
         <div className={styles.userInfo}>
-          <a href={`/profile/${user.id}`}>
+          <a href={`/profile/${comment.user.id}`}>
             <div className={styles.username}>{comment.user.username}</div>
           </a>
 

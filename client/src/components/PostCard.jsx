@@ -35,7 +35,7 @@ const PostCard = ({
   return (
     <article className={styles.card}>
       <div className={styles.header}>
-        <a href={`/profile/${user.id}`}>
+        <a href={`/profile/${post.user.id}`}>
           <img
             className={styles.avatar}
             src={
@@ -47,7 +47,7 @@ const PostCard = ({
         </a>
 
         <div className={styles.userInfo}>
-          <a href={`/profile/${user.id}`}>
+          <a href={`/profile/${post.user.id}`}>
             <div className={styles.username}>{post.user.username}</div>
           </a>
 
