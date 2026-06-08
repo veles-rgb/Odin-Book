@@ -18,7 +18,7 @@ const Navbar = () => {
           <h1 className={styles.logo}>Vel</h1>
         </Link>
 
-        <nav>
+        <nav className={styles.nav}>
           {!user && (
             <div className={styles.authLinks}>
               <Link to="/login" className={styles.loginLink}>
@@ -33,18 +33,27 @@ const Navbar = () => {
 
           {user && (
             <div className={styles.userMenu}>
-              <span className={styles.username}>{user.username}</span>
+              <Link
+                to={`/profile/${user.username}`}
+                className={styles.profileLink}
+              >
+                <span className={styles.username}>@{user.username}</span>
 
-              <img
-                src={
-                  user.profile_picture_url ||
-                  'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
-                }
-                alt="profile"
-                className={styles.avatar}
-              />
+                <img
+                  src={
+                    user.profile_picture_url ||
+                    'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
+                  }
+                  alt={`${user.username}'s profile`}
+                  className={styles.avatar}
+                />
+              </Link>
 
-              <button className={styles.logoutButton} onClick={handleClick}>
+              <button
+                type="button"
+                className={styles.logoutButton}
+                onClick={handleClick}
+              >
                 Logout
               </button>
             </div>
