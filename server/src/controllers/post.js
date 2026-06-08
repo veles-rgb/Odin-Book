@@ -351,10 +351,109 @@ async function getFeedPosts(req, res, next) {
     }
 }
 
+const getUserPosts = async (req, res, next) => {
+    try {
+        const user = req.user;
+        const { identifier } = req.params;
+
+        let profileUser;
+
+        if (isUUID(identifier)) {
+            profileUser = await prisma.user.findUnique({
+                where: {
+                    id: identifier,
+                },
+                select: {
+                    id: true,
+                },
+            });
+        } else {
+            profileUser = await prisma.user.findUnique({
+                where: {
+                    username: identifier,
+                },
+                select: {
+                    id: true,
+                },
+            });
+        }
+
+        if (!profileUser) {
+            return res.status(404).json({
+                error: "User not found.",
+            });
+        }
+
+        const posts = await prisma.post.findMany({
+            where: {
+                user_id: profileUser.id,
+            },
+            orderBy: {
+                created_at: "desc",
+            },
+            select: {
+                id: true,
+                content: true,
+                created_at: true,
+                updated_at: true,
+                user_id: true,
+
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        first_name: true,
+                        last_name: true,
+                        profile_picture_url: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        postLikes: true,
+                        comments: true,
+                    },
+                },
+
+                postLikes: {
+                    where: {
+                        user_id: user.id,
+                    },
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+        });
+
+        const formattedPosts = posts.map((post) => ({
+            id: post.id,
+            user_id: post.user_id,
+            content: post.content,
+            created_at: post.created_at,
+            updated_at: post.updated_at,
+
+            user: post.user,
+
+            likeCount: post._count.postLikes,
+            likedByMe: post.postLikes.length > 0,
+
+            commentCount: post._count.comments,
+        }));
+
+        return res.status(200).json({
+            posts: formattedPosts,
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     createPost,
     editPost,
     deletePost,
     getPostById,
     getFeedPosts,
+    getUserPosts
 };
