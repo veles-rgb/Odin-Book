@@ -11,7 +11,8 @@
     text-align: center;
 }
 
-.error {
+.error,
+.relationshipError {
     color: red;
 }
 
@@ -88,24 +89,52 @@
     color: #374151;
 }
 
-.relationshipButton {
+.profileActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    width: fit-content;
+}
+
+.requestActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.relationshipButton,
+.secondaryButton,
+.createPostButton {
     width: fit-content;
 
-    margin-top: 0.25rem;
     padding: 0.5rem 0.9rem;
 
     border: none;
     border-radius: 8px;
 
-    background: #111827;
-    color: white;
-
     cursor: pointer;
 }
 
-.relationshipButton:disabled {
+.relationshipButton,
+.createPostButton {
+    background: #111827;
+    color: white;
+}
+
+.secondaryButton {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.relationshipButton:disabled,
+.secondaryButton:disabled,
+.createPostButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.relationshipError {
+    font-size: 0.85rem;
 }
 
 .stats {
@@ -130,6 +159,13 @@
 .statLabel {
     color: #6b7280;
     font-size: 0.85rem;
+}
+
+.createPostWrapper {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 1rem;
 }
 
 .postsSection {
