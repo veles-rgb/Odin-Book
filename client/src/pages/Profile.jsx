@@ -9,6 +9,7 @@ import { FaRegClock } from 'react-icons/fa';
 import Tooltip from '../components/Tooltip';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/CreatePostModal';
+import EditProfileModal from '../components/EditProfileModal';
 
 const Profile = () => {
   const { identifier } = useParams();
@@ -391,7 +392,18 @@ const Profile = () => {
             </div>
           )}
 
-          {showEditProfile && <div>Edit profile modal goes here</div>}
+          {showEditProfile && (
+            <EditProfileModal
+              profile={profile}
+              onClose={() => setShowEditProfile(false)}
+              onUpdate={(updatedUser) => {
+                setProfile((prev) => ({
+                  ...prev,
+                  ...updatedUser,
+                }));
+              }}
+            />
+          )}
 
           <section className={styles.postsSection}>
             <h2 className={styles.postsTitle}>Posts</h2>
