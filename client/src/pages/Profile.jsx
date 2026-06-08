@@ -24,6 +24,9 @@ const Profile = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [postsError, setPostsError] = useState(null);
 
+  const [relationshipLoading, setRelationshipLoading] = useState(false);
+  const [relationshipError, setRelationshipError] = useState(null);
+
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
 
@@ -93,7 +96,6 @@ const Profile = () => {
   const getRelationshipButtonText = () => {
     if (!relationship) return null;
 
-    if (relationship.incomingRequestPending) return 'Respond to request';
     if (relationship.outgoingRequestPending) return 'Request sent';
     if (relationship.isFollowing) return 'Following';
 
@@ -102,6 +104,154 @@ const Profile = () => {
 
   const handleShowCreatePost = () => {
     setShowCreatePost((prev) => !prev);
+  };
+
+  const handleRelationshipClick = async () => {
+    try {
+      setRelationshipLoading(true);
+      setRelationshipError(null);
+
+      if (relationship.isFollowing) {
+        const response = await apiFetch(`/api/follow/${profile.id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response) return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setRelationshipError(data.error);
+          return;
+        }
+
+        setRelationship((prev) => ({
+          ...prev,
+          isFollowing: false,
+        }));
+
+        setProfile((prev) => ({
+          ...prev,
+          followerCount: Math.max(prev.followerCount - 1, 0),
+        }));
+
+        return;
+      }
+
+      if (relationship.outgoingRequestPending) {
+        const response = await apiFetch(`/api/follow/${profile.id}/request`, {
+          method: 'DELETE',
+        });
+
+        if (!response) return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setRelationshipError(data.error);
+          return;
+        }
+
+        setRelationship((prev) => ({
+          ...prev,
+          outgoingRequestPending: false,
+        }));
+
+        return;
+      }
+
+      const response = await apiFetch(`/api/follow/${profile.id}/request`, {
+        method: 'POST',
+      });
+
+      if (!response) return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRelationshipError(data.error);
+        return;
+      }
+
+      setRelationship((prev) => ({
+        ...prev,
+        outgoingRequestPending: true,
+      }));
+    } catch {
+      setRelationshipError('Something went wrong.');
+    } finally {
+      setRelationshipLoading(false);
+    }
+  };
+
+  const handleAcceptRequest = async () => {
+    try {
+      setRelationshipLoading(true);
+      setRelationshipError(null);
+
+      const response = await apiFetch(
+        `/api/follow/requests/${profile.id}/accept`,
+        {
+          method: 'POST',
+        },
+      );
+
+      if (!response) return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRelationshipError(data.error);
+        return;
+      }
+
+      setRelationship((prev) => ({
+        ...prev,
+        incomingRequestPending: false,
+        isFollowedBy: true,
+      }));
+
+      setProfile((prev) => ({
+        ...prev,
+        followingCount: prev.followingCount + 1,
+      }));
+    } catch {
+      setRelationshipError('Something went wrong.');
+    } finally {
+      setRelationshipLoading(false);
+    }
+  };
+
+  const handleDenyRequest = async () => {
+    try {
+      setRelationshipLoading(true);
+      setRelationshipError(null);
+
+      const response = await apiFetch(
+        `/api/follow/requests/${profile.id}/reject`,
+        {
+          method: 'DELETE',
+        },
+      );
+
+      if (!response) return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRelationshipError(data.error);
+        return;
+      }
+
+      setRelationship((prev) => ({
+        ...prev,
+        incomingRequestPending: false,
+      }));
+    } catch {
+      setRelationshipError('Something went wrong.');
+    } finally {
+      setRelationshipLoading(false);
+    }
   };
 
   return (
@@ -161,14 +311,43 @@ const Profile = () => {
                     >
                       Edit profile
                     </button>
+                  ) : relationship.incomingRequestPending ? (
+                    <div className={styles.requestActions}>
+                      <button
+                        type="button"
+                        className={styles.relationshipButton}
+                        onClick={handleAcceptRequest}
+                        disabled={relationshipLoading}
+                      >
+                        Accept
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={handleDenyRequest}
+                        disabled={relationshipLoading}
+                      >
+                        Deny
+                      </button>
+                    </div>
                   ) : (
                     <button
                       type="button"
                       className={styles.relationshipButton}
-                      disabled={relationship.outgoingRequestPending}
+                      onClick={handleRelationshipClick}
+                      disabled={relationshipLoading}
                     >
-                      {getRelationshipButtonText()}
+                      {relationshipLoading
+                        ? 'Loading...'
+                        : getRelationshipButtonText()}
                     </button>
+                  )}
+
+                  {relationshipError && (
+                    <div className={styles.relationshipError}>
+                      {relationshipError}
+                    </div>
                   )}
                 </div>
               </div>
@@ -212,12 +391,7 @@ const Profile = () => {
             </div>
           )}
 
-          {showEditProfile && (
-            <div>
-              {/* Replace this with EditProfileModal later */}
-              Edit profile modal goes here
-            </div>
-          )}
+          {showEditProfile && <div>Edit profile modal goes here</div>}
 
           <section className={styles.postsSection}>
             <h2 className={styles.postsTitle}>Posts</h2>
