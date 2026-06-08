@@ -4,6 +4,7 @@ const commentController = require('../controllers/comment');
 
 router.get('/feed', controller.getFeedPosts);
 router.get('/:id', controller.getPostById);
+router.get("/:identifier/posts", controller.getUserPosts);
 router.get('/:id/comments', commentController.getPostComments);
 router.post('/create', controller.createPost);
 router.patch('/edit/:id', controller.editPost);
