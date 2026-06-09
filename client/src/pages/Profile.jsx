@@ -401,6 +401,16 @@ const Profile = () => {
                   ...prev,
                   ...updatedUser,
                 }));
+
+                setPosts((prev) =>
+                  prev.map((post) => ({
+                    ...post,
+                    user: {
+                      ...post.user,
+                      ...updatedUser,
+                    },
+                  })),
+                );
               }}
             />
           )}
