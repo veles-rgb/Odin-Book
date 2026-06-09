@@ -10,6 +10,8 @@ import Tooltip from '../components/Tooltip';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/CreatePostModal';
 import EditProfileModal from '../components/EditProfileModal';
+import FollowersList from '../components/FollowersList';
+import FollowingList from '../components/FollowingList';
 
 const Profile = () => {
   const { identifier } = useParams();
@@ -30,6 +32,10 @@ const Profile = () => {
 
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [showRemoveFollowerConfirm, setShowRemoveFollowerConfirm] =
+    useState(false);
 
   const { apiFetch } = useApiFetch();
 
@@ -255,6 +261,43 @@ const Profile = () => {
     }
   };
 
+  const handleRemoveFollower = async () => {
+    try {
+      setRelationshipLoading(true);
+      setRelationshipError(null);
+
+      const response = await apiFetch(`/api/follow/${profile.id}/follower`, {
+        method: 'DELETE',
+      });
+
+      if (!response) return;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRelationshipError(data.error || data.message);
+        return;
+      }
+
+      setRelationship((prev) => ({
+        ...prev,
+        isFollowedBy: false,
+      }));
+
+      setProfile((prev) => ({
+        ...prev,
+        followerCount: Math.max(prev.followerCount - 1, 0),
+      }));
+
+      setShowRemoveFollowerConfirm(false);
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      setRelationshipError('Something went wrong.');
+    } finally {
+      setRelationshipLoading(false);
+    }
+  };
+
   return (
     <main className={styles.profileMain}>
       {isLoading && <div className={styles.loading}>Loading profile...</div>}
@@ -292,7 +335,13 @@ const Profile = () => {
                 {!profileBelongsToUser && (
                   <div className={styles.relationshipInfo}>
                     {relationship.isFollowedBy && (
-                      <span className={styles.followsYou}>Follows you</span>
+                      <button
+                        type="button"
+                        className={styles.followsYou}
+                        onClick={() => setShowRemoveFollowerConfirm(true)}
+                      >
+                        Follows you
+                      </button>
                     )}
 
                     {relationship.incomingRequestPending && (
@@ -301,6 +350,43 @@ const Profile = () => {
                       </span>
                     )}
                   </div>
+                )}
+
+                {showRemoveFollowerConfirm && (
+                  <>
+                    <div
+                      className="modal-backdrop"
+                      onClick={() => setShowRemoveFollowerConfirm(false)}
+                    />
+
+                    <div className={styles.removeFollowerBox}>
+                      <h3>Remove follower?</h3>
+
+                      <p>@{profile.username} will no longer follow you.</p>
+
+                      <div className={styles.removeFollowerActions}>
+                        <button
+                          type="button"
+                          className={styles.removeFollowerButton}
+                          onClick={handleRemoveFollower}
+                          disabled={relationshipLoading}
+                        >
+                          {relationshipLoading
+                            ? 'Removing...'
+                            : 'Remove follower'}
+                        </button>
+
+                        <button
+                          type="button"
+                          className={styles.secondaryButton}
+                          onClick={() => setShowRemoveFollowerConfirm(false)}
+                          disabled={relationshipLoading}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className={styles.profileActions}>
@@ -354,19 +440,33 @@ const Profile = () => {
               </div>
 
               <div className={styles.stats}>
-                <div className={styles.statItem}>
+                <div
+                  className={styles.statItem}
+                  onClick={() => setShowFollowers((prev) => !prev)}
+                >
                   <span className={styles.statNumber}>
                     {profile.followerCount}
                   </span>
                   <span className={styles.statLabel}>Followers</span>
                 </div>
 
-                <div className={styles.statItem}>
+                {showFollowers && (
+                  <FollowersList onClose={() => setShowFollowers(false)} />
+                )}
+
+                <div
+                  className={styles.statItem}
+                  onClick={() => setShowFollowing((prev) => !prev)}
+                >
                   <span className={styles.statNumber}>
                     {profile.followingCount}
                   </span>
                   <span className={styles.statLabel}>Following</span>
                 </div>
+
+                {showFollowing && (
+                  <FollowingList onClose={() => setShowFollowing(false)} />
+                )}
               </div>
             </div>
           </section>
