@@ -354,6 +354,7 @@ async function removeFollower(req, res, next) {
 
 async function getFollowers(req, res, next) {
     try {
+        const currentUser = req.user;
         const { id } = req.params;
 
         const profileUser = await findUserByIdentifier(id);
@@ -370,9 +371,6 @@ async function getFollowers(req, res, next) {
                 created_at: 'desc',
             },
             select: {
-                id: true,
-                created_at: true,
-
                 follower: {
                     select: {
                         id: true,
@@ -385,7 +383,56 @@ async function getFollowers(req, res, next) {
             },
         });
 
-        return res.status(200).json({ followers });
+        const followerIds = followers.map((follow) => follow.follower.id);
+
+        const [currentUserFollowing, outgoingRequests] = await prisma.$transaction([
+            prisma.follow.findMany({
+                where: {
+                    follower_id: currentUser.id,
+                    following_id: {
+                        in: followerIds,
+                    },
+                },
+                select: {
+                    following_id: true,
+                },
+            }),
+
+            prisma.followRequest.findMany({
+                where: {
+                    requester_id: currentUser.id,
+                    receiver_id: {
+                        in: followerIds,
+                    },
+                },
+                select: {
+                    receiver_id: true,
+                },
+            }),
+        ]);
+
+        const followingIds = new Set(
+            currentUserFollowing.map((follow) => follow.following_id)
+        );
+
+        const requestedIds = new Set(
+            outgoingRequests.map((request) => request.receiver_id)
+        );
+
+        const formattedFollowers = followers.map((follow) => ({
+            id: follow.follower.id,
+            username: follow.follower.username,
+            first_name: follow.follower.first_name,
+            last_name: follow.follower.last_name,
+            profile_picture_url: follow.follower.profile_picture_url,
+            isCurrentUser: follow.follower.id === currentUser.id,
+            isFollowing: followingIds.has(follow.follower.id),
+            outgoingRequestPending: requestedIds.has(follow.follower.id),
+        }));
+
+        return res.status(200).json({
+            followers: formattedFollowers,
+        });
     } catch (error) {
         return next(error);
     }
@@ -393,6 +440,7 @@ async function getFollowers(req, res, next) {
 
 async function getFollowing(req, res, next) {
     try {
+        const currentUser = req.user;
         const { id } = req.params;
 
         const profileUser = await findUserByIdentifier(id);
@@ -409,9 +457,6 @@ async function getFollowing(req, res, next) {
                 created_at: 'desc',
             },
             select: {
-                id: true,
-                created_at: true,
-
                 following: {
                     select: {
                         id: true,
@@ -424,7 +469,56 @@ async function getFollowing(req, res, next) {
             },
         });
 
-        return res.status(200).json({ following });
+        const followingUserIds = following.map((follow) => follow.following.id);
+
+        const [currentUserFollowing, outgoingRequests] = await prisma.$transaction([
+            prisma.follow.findMany({
+                where: {
+                    follower_id: currentUser.id,
+                    following_id: {
+                        in: followingUserIds,
+                    },
+                },
+                select: {
+                    following_id: true,
+                },
+            }),
+
+            prisma.followRequest.findMany({
+                where: {
+                    requester_id: currentUser.id,
+                    receiver_id: {
+                        in: followingUserIds,
+                    },
+                },
+                select: {
+                    receiver_id: true,
+                },
+            }),
+        ]);
+
+        const currentUserFollowingIds = new Set(
+            currentUserFollowing.map((follow) => follow.following_id)
+        );
+
+        const requestedIds = new Set(
+            outgoingRequests.map((request) => request.receiver_id)
+        );
+
+        const formattedFollowing = following.map((follow) => ({
+            id: follow.following.id,
+            username: follow.following.username,
+            first_name: follow.following.first_name,
+            last_name: follow.following.last_name,
+            profile_picture_url: follow.following.profile_picture_url,
+            isCurrentUser: follow.following.id === currentUser.id,
+            isFollowing: currentUserFollowingIds.has(follow.following.id),
+            outgoingRequestPending: requestedIds.has(follow.following.id),
+        }));
+
+        return res.status(200).json({
+            following: formattedFollowing,
+        });
     } catch (error) {
         return next(error);
     }
