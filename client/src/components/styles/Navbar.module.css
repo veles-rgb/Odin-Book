@@ -40,8 +40,8 @@
 
 .authLinks {
     display: flex;
-    gap: 0.75rem;
     align-items: center;
+    gap: 0.75rem;
 }
 
 .loginLink,
@@ -85,6 +85,68 @@
     display: flex;
     align-items: center;
     gap: 0.85rem;
+}
+
+.activityWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.activityButton {
+    position: relative;
+
+    border: none;
+    background: transparent;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    color: #374151;
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.activityButton:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.activityBell {
+    font-size: 1.2rem;
+}
+
+.notificationCount {
+    position: absolute;
+    top: 4px;
+    right: 3px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 0.3rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: #dc2626;
+    color: white;
+
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .profileLink {
