@@ -1,14 +1,58 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
+import { useApiFetch } from '../hooks/useApiFetch';
 import styles from './styles/Navbar.module.css';
+
+import { FaRegBell } from 'react-icons/fa';
+import ActivityModal from './ActivityModal';
 
 const Navbar = () => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
+  const { apiFetch } = useApiFetch();
 
-  const handleClick = () => {
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [receivedRequestCount, setReceivedRequestCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReceivedRequestCount(0);
+      return;
+    }
+
+    const fetchReceivedRequestCount = async () => {
+      try {
+        const response = await apiFetch('/api/follow/requests/received');
+
+        if (!response) return;
+
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        setReceivedRequestCount(data.received_follow_requests?.length || 0);
+      } catch {
+        setReceivedRequestCount(0);
+      }
+    };
+
+    fetchReceivedRequestCount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handleLogout = () => {
     logout();
+  };
+
+  const handleActivityToggle = () => {
+    setShowActivityModal((prev) => !prev);
+  };
+
+  const handleCloseActivity = () => {
+    setShowActivityModal(false);
   };
 
   return (
@@ -33,6 +77,30 @@ const Navbar = () => {
 
           {user && (
             <div className={styles.userMenu}>
+              <div className={styles.activityWrapper}>
+                <button
+                  type="button"
+                  className={styles.activityButton}
+                  onClick={handleActivityToggle}
+                  aria-label="Open activity"
+                >
+                  <FaRegBell className={styles.activityBell} />
+
+                  {receivedRequestCount > 0 && (
+                    <span className={styles.notificationCount}>
+                      {receivedRequestCount}
+                    </span>
+                  )}
+                </button>
+
+                {showActivityModal && (
+                  <ActivityModal
+                    onClose={handleCloseActivity}
+                    onReceivedCountChange={setReceivedRequestCount}
+                  />
+                )}
+              </div>
+
               <Link
                 to={`/profile/${user.username}`}
                 className={styles.profileLink}
@@ -52,7 +120,7 @@ const Navbar = () => {
               <button
                 type="button"
                 className={styles.logoutButton}
-                onClick={handleClick}
+                onClick={handleLogout}
               >
                 Logout
               </button>
