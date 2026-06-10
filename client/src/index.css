@@ -243,3 +243,20 @@ a {
 .modal-close-button:hover {
     color: #111827;
 }
+
+/* =========================
+   REGISTER / LOGIN PAGE STYLES
+   ========================= */
+.input-error {
+    border-color: #dc2626 !important;
+}
+
+.input-success {
+    border-color: #16a34a !important;
+}
+
+.success {
+    color: #16a34a;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
