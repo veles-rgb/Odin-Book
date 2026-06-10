@@ -7,10 +7,19 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const { registerUser, error, isLoading } = useRegister();
+
+  const passwordsMatch =
+    confirmPassword.length > 0 && password === confirmPassword;
+
+  const showPasswordMismatch =
+    confirmPassword.length > 0 && password !== confirmPassword;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) return;
 
     await registerUser(firstName, lastName, username, password);
   };
@@ -43,8 +52,6 @@ const Register = () => {
       <label>Password:</label>
       <input
         type="password"
-        name=""
-        id=""
         onChange={(e) => setPassword(e.target.value)}
         value={password}
       />
@@ -52,15 +59,35 @@ const Register = () => {
       <label>Confirm password:</label>
       <input
         type="password"
-        name=""
-        id=""
         onChange={(e) => setConfirmPassword(e.target.value)}
         value={confirmPassword}
+        className={
+          showPasswordMismatch
+            ? 'input-error'
+            : passwordsMatch
+              ? 'input-success'
+              : ''
+        }
       />
 
-      <button type="submit" disabled={isLoading}>
-        Register
+      {showPasswordMismatch && (
+        <div className="error">Passwords do not match.</div>
+      )}
+
+      {passwordsMatch && <div className="success">✓ Passwords match</div>}
+
+      <button
+        type="submit"
+        disabled={
+          isLoading ||
+          !password ||
+          !confirmPassword ||
+          password !== confirmPassword
+        }
+      >
+        {isLoading ? 'Registering...' : 'Register'}
       </button>
+
       {error && <div className="error">{error}</div>}
     </form>
   );
