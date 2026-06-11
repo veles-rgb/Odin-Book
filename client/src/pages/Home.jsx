@@ -17,7 +17,6 @@ const Home = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
 
   const navigate = useNavigate();
-
   const { apiFetch } = useApiFetch();
 
   const fetchPosts = async (pageToFetch) => {
@@ -26,7 +25,7 @@ const Home = () => {
       setError(null);
 
       const response = await apiFetch(
-        `/api/post/feed?page=${pageToFetch}&limit=10`,
+        `/api/post/home?page=${pageToFetch}&limit=10`,
       );
 
       if (!response) return;
@@ -45,8 +44,7 @@ const Home = () => {
       }
 
       setHasNextPage(data.hasNextPage);
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setError('Something went wrong.');
     } finally {
       setIsLoading(false);
@@ -74,7 +72,12 @@ const Home = () => {
 
   return (
     <main className={styles.homePage}>
-      <div>
+      <div className={styles.header}>
+        <div>
+          <h1 className={styles.title}>Explore</h1>
+          <p className={styles.subtitle}>See the latest posts from everyone.</p>
+        </div>
+
         <div className={styles.headerBtns}>
           <button
             type="button"
@@ -85,24 +88,29 @@ const Home = () => {
           </button>
 
           <button
+            type="button"
             className={styles.myFeedBtn}
             onClick={() => navigate('/feed')}
           >
             My Feed
           </button>
         </div>
-
-        {showCreatePost && (
-          <CreatePostModal
-            onClose={() => setShowCreatePost(false)}
-            onPostCreated={(newPost) => {
-              setPosts((prev) => [newPost, ...prev]);
-            }}
-          />
-        )}
       </div>
 
+      {showCreatePost && (
+        <CreatePostModal
+          onClose={() => setShowCreatePost(false)}
+          onPostCreated={(newPost) => {
+            setPosts((prev) => [newPost, ...prev]);
+          }}
+        />
+      )}
+
       {error && <div className={styles.error}>{error}</div>}
+
+      {!isLoading && !error && posts.length === 0 && (
+        <div className={styles.emptyHome}>No posts yet.</div>
+      )}
 
       <div className={styles.postsContainer}>
         {posts.map((post) => (
@@ -126,7 +134,12 @@ const Home = () => {
       </div>
 
       {hasNextPage && (
-        <button type="button" onClick={handleShowMore} disabled={isLoading}>
+        <button
+          type="button"
+          className={styles.showMoreBtn}
+          onClick={handleShowMore}
+          disabled={isLoading}
+        >
           {isLoading ? 'Loading...' : 'Show More'}
         </button>
       )}
