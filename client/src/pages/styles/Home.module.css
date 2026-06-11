@@ -16,3 +16,25 @@
 .error {
     color: #dc2626;
 }
+
+.headerBtns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.createPostBtn,
+.myFeedBtn {
+    width: fit-content;
+
+    padding: 0.5rem 0.9rem;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.createPostBtn {
+    background: #111827;
+    color: white;
+}
