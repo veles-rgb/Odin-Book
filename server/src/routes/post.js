@@ -2,6 +2,7 @@ const router = require('express').Router();
 const controller = require('../controllers/post');
 const commentController = require('../controllers/comment');
 
+router.get('/home', controller.getHomePosts);
 router.get('/feed', controller.getFeedPosts);
 router.get('/:id', controller.getPostById);
 router.get("/:identifier/posts", controller.getUserPosts);
