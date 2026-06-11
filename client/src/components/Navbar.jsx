@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { useApiFetch } from '../hooks/useApiFetch';
 import styles from './styles/Navbar.module.css';
 
-import { FaRegBell } from 'react-icons/fa';
+import { FaRegBell, FaSearch } from 'react-icons/fa';
 import ActivityModal from './ActivityModal';
 
 const Navbar = () => {
@@ -15,6 +16,8 @@ const Navbar = () => {
 
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [receivedRequestCount, setReceivedRequestCount] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
@@ -77,6 +80,11 @@ const Navbar = () => {
 
           {user && (
             <div className={styles.userMenu}>
+              <FaSearch
+                className={styles.searchButton}
+                onClick={() => navigate('/search')}
+              />
+
               <div className={styles.activityWrapper}>
                 <button
                   type="button"
