@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Post from './pages/Post';
 import Profile from './pages/Profile';
+import UserIndex from './pages/userIndex';
 
 function App() {
   const { user } = useAuthContext();
@@ -39,6 +40,11 @@ function App() {
           <Route
             path="/profile/:identifier"
             element={user ? <Profile /> : <Navigate to={'/login'} />}
+          />
+
+          <Route
+            path="/search"
+            element={user ? <UserIndex /> : <Navigate to={'/login'} />}
           />
         </Routes>
       </BrowserRouter>
