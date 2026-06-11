@@ -1,3 +1,123 @@
+:root {
+    /* =========================
+     SURFACES
+  ========================= */
+
+    --color-background: #f9fafb;
+    --color-surface: #ffffff;
+    --color-surface-hover: #f3f4f6;
+
+    /* =========================
+     TEXT
+  ========================= */
+
+    --color-text-primary: #111827;
+    --color-text-secondary: #374151;
+    --color-text-muted: #6b7280;
+    --color-text-inverse: #ffffff;
+
+    /* =========================
+     BORDERS
+  ========================= */
+
+    --color-border: #e5e7eb;
+    --color-border-hover: #d1d5db;
+
+    /* =========================
+     BRAND
+  ========================= */
+
+    --color-brand: #2563eb;
+    --color-brand-hover: #1d4ed8;
+    --color-brand-bg: #dbeafe;
+    --color-brand-border: #93c5fd;
+    --color-brand-text: #1e40af;
+
+    /* =========================
+     PRIMARY
+  ========================= */
+
+    --color-primary: #111827;
+    --color-primary-hover: #1f2937;
+
+    /* =========================
+     SUCCESS
+  ========================= */
+
+    --color-success: #16a34a;
+    --color-success-hover: #15803d;
+    --color-success-bg: #dcfce7;
+    --color-success-border: #86efac;
+    --color-success-text: #166534;
+
+    /* =========================
+     ERROR / DANGER
+  ========================= */
+
+    --color-error: #dc2626;
+    --color-error-hover: #b91c1c;
+    --color-error-bg: #fee2e2;
+    --color-error-bg-hover: #fecaca;
+    --color-error-border: #fca5a5;
+    --color-error-text: #991b1b;
+
+    /* =========================
+     WARNING
+  ========================= */
+
+    --color-warning: #d97706;
+    --color-warning-bg: #fef3c7;
+    --color-warning-border: #fcd34d;
+    --color-warning-text: #92400e;
+
+    /* =========================
+     INFO
+  ========================= */
+
+    --color-info: #2563eb;
+    --color-info-bg: #dbeafe;
+    --color-info-border: #93c5fd;
+    --color-info-text: #1e40af;
+
+    /* =========================
+     INPUTS
+  ========================= */
+
+    --color-input-bg: #ffffff;
+    --color-input-border: #d1d5db;
+    --color-input-focus: #111827;
+
+    /* =========================
+     SHADOWS
+  ========================= */
+
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-lg:
+        0 18px 40px rgba(0, 0, 0, 0.14),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+
+    /* =========================
+     BORDER RADIUS
+  ========================= */
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 14px;
+    --radius-pill: 999px;
+
+    /* =========================
+     TRANSITIONS
+  ========================= */
+
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+}
+
+/* =========================
+   BASE RESET
+========================= */
+
 *,
 *::before,
 *::after {
@@ -6,15 +126,69 @@
 
 body {
     margin: 0;
+
+    background: var(--color-background);
+    color: var(--color-text-primary);
 }
 
 a {
+    color: inherit;
     text-decoration: none;
 }
 
+button,
+input,
+textarea {
+    font: inherit;
+}
+
 /* =========================
-   Modal Overlay
-   ========================= */
+   GLOBAL STATUS MESSAGES
+========================= */
+
+.error,
+.success,
+.info {
+    padding: 0.75rem 1rem;
+
+    border-radius: var(--radius-sm);
+
+    font-size: 0.95rem;
+}
+
+.error {
+    border: 1px solid var(--color-error-border);
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+}
+
+.success {
+    border: 1px solid var(--color-success-border);
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+}
+
+.info {
+    border: 1px solid var(--color-info-border);
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
+}
+
+/* =========================
+   FORM VALIDATION
+========================= */
+
+.input-error {
+    border-color: var(--color-error) !important;
+}
+
+.input-success {
+    border-color: var(--color-success) !important;
+}
+
+/* =========================
+   MODAL OVERLAY
+========================= */
 
 .modal-backdrop {
     position: fixed;
@@ -26,12 +200,11 @@ a {
 }
 
 /* =========================
-   Modal Container
-   ========================= */
+   MODAL CONTAINER
+========================= */
 
 .modal {
     position: fixed;
-
     top: 50%;
     left: 50%;
 
@@ -39,10 +212,10 @@ a {
 
     width: min(90vw, 600px);
 
-    background: white;
-    border-radius: 12px;
-
     padding: 1.5rem;
+
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
 
     box-shadow:
         0 10px 30px rgba(0, 0, 0, 0.2),
@@ -50,15 +223,11 @@ a {
 
     z-index: 1000;
 
-    animation: modalFadeIn 0.15s ease;
+    animation: modalFadeIn var(--transition-fast);
 }
 
-/* =========================
-   Modal Content
-   ========================= */
-
 .modal h3 {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
 }
 
 .modal form {
@@ -73,10 +242,18 @@ a {
 
     padding: 0.75rem;
 
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
 
-    font: inherit;
+    background: var(--color-input-bg);
+    color: var(--color-text-primary);
+
+    outline: none;
+}
+
+.modal input:focus,
+.modal textarea:focus {
+    border-color: var(--color-input-focus);
 }
 
 .modal textarea {
@@ -85,8 +262,16 @@ a {
 }
 
 /* =========================
-   Modal Buttons
-   ========================= */
+   MODAL HEADER / ACTIONS
+========================= */
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 1rem;
+}
 
 .modal-actions {
     display: flex;
@@ -94,18 +279,30 @@ a {
     gap: 0.75rem;
 }
 
-/* =========================
-   Modal Errors
-   ========================= */
+.modal-close-button {
+    border: none;
+    background: transparent;
+
+    font-size: 1.5rem;
+    line-height: 1;
+
+    color: var(--color-text-muted);
+
+    cursor: pointer;
+}
+
+.modal-close-button:hover {
+    color: var(--color-text-primary);
+}
 
 .modal-error {
-    color: red;
+    color: var(--color-error);
     font-size: 0.9rem;
 }
 
 /* =========================
-   Animation
-   ========================= */
+   MODAL ANIMATION
+========================= */
 
 @keyframes modalFadeIn {
     from {
@@ -120,8 +317,8 @@ a {
 }
 
 /* =========================
-   FOLLOWING / FOLLOWERS LIST
-   ========================= */
+   FOLLOWERS / FOLLOWING LIST
+========================= */
 
 .user-list {
     list-style: none;
@@ -142,10 +339,10 @@ a {
 
     padding: 0.75rem;
 
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
 
-    background: white;
+    background: var(--color-surface);
 }
 
 .user-list-user {
@@ -156,7 +353,6 @@ a {
     min-width: 0;
 
     color: inherit;
-    text-decoration: none;
 }
 
 .user-list-avatar {
@@ -175,7 +371,7 @@ a {
 
 .user-list-name {
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text-primary);
 
     white-space: nowrap;
     overflow: hidden;
@@ -184,7 +380,7 @@ a {
 
 .user-list-username {
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
 
     white-space: nowrap;
     overflow: hidden;
@@ -196,7 +392,7 @@ a {
     flex-shrink: 0;
 
     border: none;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
     padding: 0.45rem 0.8rem;
 
@@ -205,58 +401,25 @@ a {
 }
 
 .user-list-primary-button {
-    background: #111827;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.user-list-primary-button:hover {
+    background: var(--color-primary-hover);
 }
 
 .user-list-secondary-button {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+}
+
+.user-list-secondary-button:hover {
+    background: var(--color-border);
 }
 
 .user-list-primary-button:disabled,
 .user-list-secondary-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 1rem;
-}
-
-.modal-close-button {
-    border: none;
-    background: transparent;
-
-    font-size: 1.5rem;
-    line-height: 1;
-
-    cursor: pointer;
-
-    color: #6b7280;
-}
-
-.modal-close-button:hover {
-    color: #111827;
-}
-
-/* =========================
-   REGISTER / LOGIN PAGE STYLES
-   ========================= */
-.input-error {
-    border-color: #dc2626 !important;
-}
-
-.input-success {
-    border-color: #16a34a !important;
-}
-
-.success {
-    color: #16a34a;
-    font-size: 0.9rem;
-    font-weight: 500;
 }
