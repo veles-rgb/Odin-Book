@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApiFetch } from '../hooks/useApiFetch';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/CreatePostModal';
@@ -14,6 +15,8 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   const [showCreatePost, setShowCreatePost] = useState(false);
+
+  const navigate = useNavigate();
 
   const { apiFetch } = useApiFetch();
 
@@ -72,9 +75,22 @@ const Home = () => {
   return (
     <main className={styles.homePage}>
       <div>
-        <button type="button" onClick={handleShowCreatePost}>
-          Create Post
-        </button>
+        <div className={styles.headerBtns}>
+          <button
+            type="button"
+            className={styles.createPostBtn}
+            onClick={handleShowCreatePost}
+          >
+            Create Post
+          </button>
+
+          <button
+            className={styles.myFeedBtn}
+            onClick={() => navigate('/feed')}
+          >
+            My Feed
+          </button>
+        </div>
 
         {showCreatePost && (
           <CreatePostModal
