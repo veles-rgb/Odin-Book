@@ -1,5 +1,9 @@
 import styles from './styles/Comment.module.css';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
 
@@ -13,13 +17,21 @@ import Tooltip from './Tooltip';
 import { FaRegClock } from 'react-icons/fa';
 import { formatDateTime } from '../utils/formatDateTime';
 
+const schema = yup.object({
+  content: yup
+    .string()
+    .trim()
+    .required('Reply cannot be blank.')
+    .max(1000, 'Reply cannot exceed 1000 characters.'),
+});
+
 const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   const { user } = useAuthContext();
+
   const [viewReplies, setViewReplies] = useState(false);
   const [viewReplyBox, setViewReplyBox] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const [userReply, setUserReply] = useState('');
   const [userReplyLoading, setUserReplyLoading] = useState(false);
   const [userReplyError, setUserReplyError] = useState(null);
 
@@ -30,24 +42,37 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
   const userOwnsComment = user.id === comment.user_id;
   const commentHasBeenUpdated = comment.created_at !== comment.updated_at;
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+    },
+  });
+
   const handleViewReplies = () => {
     setViewReplies((prev) => !prev);
   };
 
   const handleViewReplyBox = () => {
     setViewReplyBox((prev) => !prev);
+    setUserReplyError(null);
   };
 
-  const handleReplySubmit = async (e) => {
-    e.preventDefault();
-
+  const handleReplySubmit = async (formData) => {
     try {
       setUserReplyLoading(true);
       setUserReplyError(null);
 
       const response = await apiFetch(`/api/comment/reply/${comment.id}`, {
         method: 'POST',
-        body: JSON.stringify({ content: userReply }),
+        body: JSON.stringify({
+          content: formData.content.trim(),
+        }),
       });
 
       if (!response) return;
@@ -55,11 +80,12 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setUserReplyError(data.error);
+        setUserReplyError(data.error || 'Failed to create reply.');
         return;
       }
 
-      setUserReply('');
+      reset();
+
       setViewReplyBox(false);
       setViewReplies(true);
       setReplyRefreshKey((prev) => prev + 1);
@@ -142,18 +168,30 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
       </div>
 
       {viewReplyBox && (
-        <form onSubmit={handleReplySubmit}>
+        <form
+          className={styles.replyForm}
+          onSubmit={handleSubmit(handleReplySubmit)}
+        >
           <textarea
-            value={userReply}
-            onChange={(e) => setUserReply(e.target.value)}
+            className={styles.replyTextarea}
             placeholder="Type your reply..."
+            disabled={userReplyLoading}
+            {...register('content')}
           />
 
-          <button type="submit" disabled={userReplyLoading}>
-            Send
-          </button>
+          <div className={styles.replyError}>{errors.content?.message}</div>
 
-          {userReplyError && <div>{userReplyError}</div>}
+          {userReplyError && (
+            <div className={styles.replyError}>{userReplyError}</div>
+          )}
+
+          <button
+            className={styles.replySubmitButton}
+            type="submit"
+            disabled={userReplyLoading}
+          >
+            {userReplyLoading ? 'Sending...' : 'Send'}
+          </button>
         </form>
       )}
 
