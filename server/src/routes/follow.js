@@ -1,19 +1,72 @@
 const router = require('express').Router();
 const controller = require('../controllers/follow');
 
-router.post('/:id/request', controller.sendFollowRequest); // sendFollowRequest
-router.delete('/:id/request', controller.cancelFollowRequest); // cancelFollowRequest
+const {
+    userIdValidation,
+    userIdentifierValidation,
+    followRequestIdValidation,
+} = require('../validators/followValidator');
 
-router.post('/requests/:id/accept', controller.acceptFollowRequest); // acceptFollowRequest
-router.delete('/requests/:id/reject', controller.rejectFollowRequest); // rejectFollowRequest
+const validate = require('../middleware/validate');
 
-router.get('/requests/received', controller.getReceivedFollowRequests); // getReceivedFollowRequests
-router.get('/requests/sent', controller.getSentFollowRequests); // getSentFollowRequests
+router.post(
+    '/:id/request',
+    userIdValidation,
+    validate,
+    controller.sendFollowRequest,
+);
 
-router.delete('/:id', controller.unfollowUser); // unfollowUser
-router.delete('/:id/follower', controller.removeFollower); // removeFollower
+router.delete(
+    '/:id/request',
+    userIdValidation,
+    validate,
+    controller.cancelFollowRequest,
+);
 
-router.get('/:id/followers', controller.getFollowers); // getFollowers
-router.get('/:id/following', controller.getFollowing); // getFollowing
+router.post(
+    '/requests/:id/accept',
+    followRequestIdValidation,
+    validate,
+    controller.acceptFollowRequest,
+);
+
+router.delete(
+    '/requests/:id/reject',
+    followRequestIdValidation,
+    validate,
+    controller.rejectFollowRequest,
+);
+
+router.get('/requests/received', controller.getReceivedFollowRequests);
+
+router.get('/requests/sent', controller.getSentFollowRequests);
+
+router.delete(
+    '/:id',
+    userIdValidation,
+    validate,
+    controller.unfollowUser,
+);
+
+router.delete(
+    '/:id/follower',
+    userIdValidation,
+    validate,
+    controller.removeFollower,
+);
+
+router.get(
+    '/:id/followers',
+    userIdentifierValidation,
+    validate,
+    controller.getFollowers,
+);
+
+router.get(
+    '/:id/following',
+    userIdentifierValidation,
+    validate,
+    controller.getFollowing,
+);
 
 module.exports = router;
