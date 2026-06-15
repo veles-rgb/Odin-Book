@@ -25,8 +25,8 @@ const Register = () => {
       .min(3, 'Username must be at least 3 characters long')
       .max(20, 'Username cannot exceed 20 characters')
       .matches(
-        /^[a-zA-O0-9_]+$/,
-        'Username can only contain letters, numbers, and underscores',
+        /^[a-zA-Z0-9._]+$/,
+        'Username can only contain letters, numbers, periods, and underscores',
       ),
     password: yup
       .string()
