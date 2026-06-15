@@ -1,57 +1,89 @@
 import styles from './styles/EditProfileModal.module.css';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
 
+const DEFAULT_AVATAR =
+  'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg';
+
+const schema = yup.object({
+  first_name: yup
+    .string()
+    .trim()
+    .required('First name is required')
+    .min(1, 'First name must be at least 1 character')
+    .max(20, 'First name cannot be longer than 20 characters'),
+
+  last_name: yup
+    .string()
+    .trim()
+    .required('Last name is required')
+    .min(1, 'Last name must be at least 1 character')
+    .max(40, 'Last name cannot be longer than 40 characters'),
+
+  username: yup
+    .string()
+    .trim()
+    .required('Username is required')
+    .min(3, 'Username must be at least 3 characters long')
+    .max(20, 'Username cannot exceed 20 characters')
+    .matches(
+      /^[a-zA-Z0-9._]+$/,
+      'Username can only contain letters, numbers, periods, and underscores',
+    ),
+
+  profile_picture_url: yup
+    .string()
+    .trim()
+    .url('Profile picture must be a valid URL')
+    .nullable()
+    .transform((value) => (value === '' ? null : value)),
+});
+
 const EditProfileModal = ({ profile, onUpdate, onClose }) => {
   const { user } = useAuthContext();
-  const [firstName, setFirstName] = useState(profile.first_name || '');
-  const [lastName, setLastName] = useState(profile.last_name || '');
-  const [username, setUsername] = useState(profile.username || '');
-  const [profilePictureUrl, setProfilePictureUrl] = useState(
-    profile.profile_picture_url || '',
-  );
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
   const { apiFetch } = useApiFetch();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState(null);
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      first_name: profile.first_name || '',
+      last_name: profile.last_name || '',
+      username: profile.username || '',
+      profile_picture_url: profile.profile_picture_url || '',
+    },
+  });
+
+  const profilePictureUrl = useWatch({
+    control,
+    name: 'profile_picture_url',
+  });
+
+  const onSubmit = async (formData) => {
     try {
       setIsLoading(true);
-      setError(null);
-
-      const trimmedFirstName = firstName.trim();
-      const trimmedLastName = lastName.trim();
-      const trimmedUsername = username.trim();
-      const trimmedProfilePictureUrl = profilePictureUrl.trim();
-
-      if (!trimmedFirstName) {
-        setError('First name is required.');
-        return;
-      }
-
-      if (!trimmedLastName) {
-        setError('Last name is required.');
-        return;
-      }
-
-      if (!trimmedUsername) {
-        setError('Username is required.');
-        return;
-      }
+      setServerError(null);
 
       const response = await apiFetch(`/api/user/update/${user.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
-          first_name: trimmedFirstName,
-          last_name: trimmedLastName,
-          username: trimmedUsername,
-          profile_picture_url: trimmedProfilePictureUrl || null,
+          first_name: formData.first_name.trim(),
+          last_name: formData.last_name.trim(),
+          username: formData.username.trim(),
+          profile_picture_url: formData.profile_picture_url || null,
         }),
       });
 
@@ -60,14 +92,14 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setServerError(data.error || 'Failed to update profile.');
         return;
       }
 
       onUpdate?.(data.user);
       onClose();
     } catch {
-      setError('Something went wrong.');
+      setServerError('Something went wrong.');
     } finally {
       setIsLoading(false);
     }
@@ -78,16 +110,13 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
       <div className="modal-backdrop" onClick={onClose} />
 
       <div className={`modal ${styles.editProfileModal}`}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <h3>Edit Profile</h3>
 
           <div className={styles.avatarPreviewWrapper}>
             <img
               className={styles.avatarPreview}
-              src={
-                profilePictureUrl ||
-                'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
-              }
+              src={profilePictureUrl || DEFAULT_AVATAR}
               alt="Profile preview"
             />
           </div>
@@ -97,10 +126,12 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
             <input
               id="first-name"
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
               disabled={isLoading}
+              {...register('first_name')}
             />
+            <div className={styles.fieldError}>
+              {errors.first_name?.message}
+            </div>
           </div>
 
           <div className={styles.fieldGroup}>
@@ -108,10 +139,10 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
             <input
               id="last-name"
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
               disabled={isLoading}
+              {...register('last_name')}
             />
+            <div className={styles.fieldError}>{errors.last_name?.message}</div>
           </div>
 
           <div className={styles.fieldGroup}>
@@ -119,10 +150,10 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
             <input
               id="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
+              {...register('username')}
             />
+            <div className={styles.fieldError}>{errors.username?.message}</div>
           </div>
 
           <div className={styles.fieldGroup}>
@@ -130,14 +161,16 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
             <input
               id="profile-picture-url"
               type="url"
-              value={profilePictureUrl}
-              onChange={(e) => setProfilePictureUrl(e.target.value)}
               disabled={isLoading}
               placeholder="https://example.com/avatar.jpg"
+              {...register('profile_picture_url')}
             />
+            <div className={styles.fieldError}>
+              {errors.profile_picture_url?.message}
+            </div>
           </div>
 
-          {error && <div className="modal-error">{error}</div>}
+          {serverError && <div className="modal-error">{serverError}</div>}
 
           <div className="modal-actions">
             <button type="submit" disabled={isLoading}>
