@@ -1,5 +1,9 @@
 import styles from './styles/CommentReply.module.css';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
 
@@ -12,6 +16,14 @@ import Tooltip from './Tooltip';
 import { FaRegClock } from 'react-icons/fa';
 import { formatDateTime } from '../utils/formatDateTime';
 
+const schema = yup.object({
+  content: yup
+    .string()
+    .trim()
+    .required('Reply cannot be blank.')
+    .max(1000, 'Reply cannot exceed 1000 characters.'),
+});
+
 const CommentReply = ({
   comment,
   onReplyCreated,
@@ -19,10 +31,10 @@ const CommentReply = ({
   onReplyEdited,
 }) => {
   const { user } = useAuthContext();
+
   const [showReply, setShowReply] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const [userReply, setUserReply] = useState('');
   const [userReplyLoading, setUserReplyLoading] = useState(false);
   const [userReplyError, setUserReplyError] = useState(null);
 
@@ -31,13 +43,24 @@ const CommentReply = ({
   const userOwnsReply = user.id === comment.user_id;
   const commentHasBeenUpdated = comment.created_at !== comment.updated_at;
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+    },
+  });
+
   const handleShowReply = () => {
     setShowReply((prev) => !prev);
+    setUserReplyError(null);
   };
 
-  const handleSubmitReply = async (e) => {
-    e.preventDefault();
-
+  const handleSubmitReply = async (formData) => {
     try {
       setUserReplyLoading(true);
       setUserReplyError(null);
@@ -45,7 +68,7 @@ const CommentReply = ({
       const response = await apiFetch(`/api/comment/reply/${comment.id}`, {
         method: 'POST',
         body: JSON.stringify({
-          content: userReply,
+          content: formData.content.trim(),
         }),
       });
 
@@ -54,11 +77,11 @@ const CommentReply = ({
       const data = await response.json();
 
       if (!response.ok) {
-        setUserReplyError(data.error);
+        setUserReplyError(data.error || 'Failed to create reply.');
         return;
       }
 
-      setUserReply('');
+      reset();
       setShowReply(false);
 
       onReplyCreated?.(data.comment);
@@ -87,6 +110,7 @@ const CommentReply = ({
           <a href={`/profile/${comment.user.id}`}>
             <div className={styles.username}>{comment.user.username}</div>
           </a>
+
           <div className={styles.dateTimeContainer}>
             <div className={styles.timestamp}>
               {formatDateTime(comment.created_at)}
@@ -145,25 +169,30 @@ const CommentReply = ({
 
       {showReply && (
         <div className={styles.replyFormWrapper}>
-          <form onSubmit={handleSubmitReply} className={styles.replyForm}>
+          <form
+            onSubmit={handleSubmit(handleSubmitReply)}
+            className={styles.replyForm}
+          >
             <textarea
               className={styles.replyTextarea}
               placeholder={`Reply to ${comment.user.username}`}
-              value={userReply}
-              onChange={(e) => setUserReply(e.target.value)}
+              disabled={userReplyLoading}
+              {...register('content')}
             />
+
+            <div className={styles.error}>{errors.content?.message}</div>
+
+            {userReplyError && (
+              <div className={styles.error}>{userReplyError}</div>
+            )}
 
             <button
               type="submit"
               className={styles.sendButton}
               disabled={userReplyLoading}
             >
-              Send
+              {userReplyLoading ? 'Sending...' : 'Send'}
             </button>
-
-            {userReplyError && (
-              <div className={styles.error}>{userReplyError}</div>
-            )}
           </form>
         </div>
       )}
