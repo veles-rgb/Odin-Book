@@ -1,18 +1,14 @@
 .reply {
     width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-
     padding: 0.75rem 0.85rem;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-
-    background-color: #ffffff;
 
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
 }
 
 .header {
@@ -24,34 +20,37 @@
 .avatar {
     width: 34px;
     height: 34px;
+    flex-shrink: 0;
 
     border-radius: 50%;
     object-fit: cover;
-
-    flex-shrink: 0;
 }
 
 .userInfo {
+    min-width: 0;
+
     display: flex;
     flex-direction: column;
-    min-width: 0;
 }
 
 .username {
+    color: #111827;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111827;
-}
-
-.dateTimeContainer,
-.timestamp {
-    font-size: 0.85rem;
-    color: #6b7280;
 }
 
 .dateTimeContainer {
     display: flex;
+    align-items: center;
     gap: 0.4rem;
+
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.timestamp {
+    color: inherit;
+    font-size: inherit;
 }
 
 .content {
@@ -64,6 +63,11 @@
     word-break: break-word;
 }
 
+.replyingTo {
+    color: #2563eb;
+    font-weight: 600;
+}
+
 .actions {
     display: flex;
     align-items: center;
@@ -73,20 +77,76 @@
     border-top: 1px solid #f3f4f6;
 }
 
+.actions button,
 .replyButton {
-    border: none;
-    background: transparent;
+    padding: 0.35rem 0.5rem;
 
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
     color: #4b5563;
+
     font-size: 0.85rem;
     font-weight: 500;
 
     cursor: pointer;
-
-    padding: 0.35rem 0.5rem;
-    border-radius: 8px;
 }
 
+.actions button:hover,
 .replyButton:hover {
-    background-color: #f3f4f6;
+    background: #f3f4f6;
+}
+
+.replyFormWrapper {
+    margin-top: 0.5rem;
+}
+
+.replyForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.replyTextarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 0.75rem;
+
+    resize: vertical;
+
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+
+    background: var(--color-input-bg);
+    color: var(--color-text-primary);
+
+    font: inherit;
+}
+
+.replyTextarea:focus {
+    outline: none;
+    border-color: var(--color-input-focus);
+}
+
+.replyTextarea:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.error {
+    min-height: 18px;
+
+    color: var(--color-error);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.sendButton {
+    align-self: flex-end;
+}
+
+.sendButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

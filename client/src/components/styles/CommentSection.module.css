@@ -4,32 +4,83 @@
     margin: 1rem auto 0;
     padding: 1rem;
 
+    background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 16px;
-    background-color: #f9fafb;
-
-    box-sizing: border-box;
 }
 
 .title {
     margin: 0 0 1rem;
+
+    color: #111827;
     font-size: 1.1rem;
     font-weight: 700;
+}
+
+.commentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    margin-bottom: 1rem;
+}
+
+.commentForm label {
     color: #111827;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.commentForm textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 0.75rem;
+
+    resize: vertical;
+
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+
+    background: var(--color-input-bg);
+    color: var(--color-text-primary);
+
+    font: inherit;
+}
+
+.commentForm textarea:focus {
+    outline: none;
+    border-color: var(--color-input-focus);
+}
+
+.commentForm textarea:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.commentForm button {
+    align-self: flex-end;
+}
+
+.commentForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .commentList {
     width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.error {
+.error,
+.formError {
+    min-height: 18px;
+
     color: #dc2626;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .loading,
