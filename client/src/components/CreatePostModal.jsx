@@ -1,24 +1,47 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 
+const schema = yup.object({
+  content: yup
+    .string()
+    .trim()
+    .required('Post content cannot be blank.')
+    .max(2000, 'Post cannot be longer than 2000 characters.'),
+});
+
 const CreatePostModal = ({ onClose, onPostCreated }) => {
-  const [postContent, setPostContent] = useState('');
   const [postIsLoading, setPostIsLoading] = useState(false);
   const [postError, setPostError] = useState(null);
 
   const { apiFetch } = useApiFetch();
 
-  const handlePostSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+    },
+  });
 
+  const onSubmit = async (formData) => {
     try {
       setPostIsLoading(true);
       setPostError(null);
 
       const response = await apiFetch('/api/post/create', {
         method: 'POST',
-        body: JSON.stringify({ content: postContent }),
+        body: JSON.stringify({
+          content: formData.content.trim(),
+        }),
       });
 
       if (!response) return;
@@ -26,12 +49,12 @@ const CreatePostModal = ({ onClose, onPostCreated }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setPostError(data.error);
+        setPostError(data.error || 'Failed to create post.');
         return;
       }
 
       onPostCreated?.(data.post);
-      setPostContent('');
+      reset();
       onClose();
     } catch {
       setPostError('Something went wrong.');
@@ -45,14 +68,16 @@ const CreatePostModal = ({ onClose, onPostCreated }) => {
       <div className="modal-backdrop" onClick={onClose} />
 
       <div className="modal">
-        <form onSubmit={handlePostSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <h3>Create a new post</h3>
 
           <textarea
             placeholder="What do you have in mind?"
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
+            disabled={postIsLoading}
+            {...register('content')}
           />
+
+          <div className="modal-error">{errors.content?.message}</div>
 
           {postError && <div className="modal-error">{postError}</div>}
 
