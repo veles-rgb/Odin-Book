@@ -1,18 +1,41 @@
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 import Comment from './Comment';
 import styles from './styles/CommentSection.module.css';
+
+const schema = yup.object({
+  content: yup
+    .string()
+    .trim()
+    .required('Comment cannot be blank.')
+    .max(1000, 'Comment cannot exceed 1000 characters.'),
+});
 
 const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [userComment, setUserComment] = useState('');
   const [userCommentLoading, setUserCommentLoading] = useState(false);
   const [userCommentError, setUserCommentError] = useState(null);
 
   const { apiFetch } = useApiFetch();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+    },
+  });
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -27,7 +50,7 @@ const CommentSection = ({ postId }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error);
+          setError(data.error || 'Failed to load comments.');
           return;
         }
 
@@ -43,16 +66,16 @@ const CommentSection = ({ postId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
 
-  const handleSubmitComment = async (e) => {
-    e.preventDefault();
-
+  const handleSubmitComment = async (formData) => {
     try {
       setUserCommentLoading(true);
       setUserCommentError(null);
 
       const response = await apiFetch(`/api/comment/create/${postId}`, {
         method: 'POST',
-        body: JSON.stringify({ content: userComment }),
+        body: JSON.stringify({
+          content: formData.content.trim(),
+        }),
       });
 
       if (!response) return;
@@ -60,14 +83,14 @@ const CommentSection = ({ postId }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setUserCommentError(data.error);
+        setUserCommentError(data.error || 'Failed to create comment.');
         return;
       }
 
       setComments((prev) => [...prev, data.comment]);
-      setUserComment('');
+      reset();
     } catch {
-      setUserCommentError('Something went wrong');
+      setUserCommentError('Something went wrong.');
     } finally {
       setUserCommentLoading(false);
     }
@@ -81,25 +104,29 @@ const CommentSection = ({ postId }) => {
       {isLoading && <div className={styles.loading}>Loading comments...</div>}
 
       {!isLoading && !error && (
-        <div>
-          <form onSubmit={handleSubmitComment}>
-            <label>Leave a comment</label>
+        <form
+          className={styles.commentForm}
+          onSubmit={handleSubmit(handleSubmitComment)}
+        >
+          <label htmlFor="comment">Leave a comment</label>
 
-            <textarea
-              name="comment"
-              id="comment"
-              placeholder="Say something..."
-              value={userComment}
-              onChange={(e) => setUserComment(e.target.value)}
-            />
+          <textarea
+            id="comment"
+            placeholder="Say something..."
+            disabled={userCommentLoading}
+            {...register('content')}
+          />
 
-            <button type="submit" disabled={userCommentLoading}>
-              Send
-            </button>
+          <div className={styles.formError}>{errors.content?.message}</div>
 
-            {userCommentError && <div>{userCommentError}</div>}
-          </form>
-        </div>
+          {userCommentError && (
+            <div className={styles.formError}>{userCommentError}</div>
+          )}
+
+          <button type="submit" disabled={userCommentLoading}>
+            {userCommentLoading ? 'Sending...' : 'Send'}
+          </button>
+        </form>
       )}
 
       {!isLoading && comments.length > 0 && (
