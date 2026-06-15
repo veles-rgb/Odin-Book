@@ -1,42 +1,65 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useLogin } from '../hooks/useLogin';
+import IsLoading from '../components/IsLoading';
+
+const schema = yup.object({
+  username: yup.string().trim().required('Username is required'),
+  password: yup.string().required('Password is required'),
+});
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const { loginUser, error, isLoading } = useLogin();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    mode: 'onSubmit',
+  });
 
-    await loginUser(username, password);
+  const onSubmit = async (data) => {
+    await loginUser(data.username, data.password);
   };
 
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <h3>Login</h3>
+    <>
+      {isLoading && <IsLoading message="Logging in..." />}
 
-      <label>Username:</label>
-      <input
-        type="text"
-        onChange={(e) => setUsername(e.target.value)}
-        value={username}
-      />
+      <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+        <h3>Login</h3>
 
-      <label>Password:</label>
-      <input
-        type="password"
-        name=""
-        id=""
-        onChange={(e) => setPassword(e.target.value)}
-        value={password}
-      />
+        <div className="login-username-container">
+          <label>Username:</label>
 
-      <button type="submit" disabled={isLoading}>
-        Login
-      </button>
-      {error && <div className="error">{error}</div>}
-    </form>
+          <input type="text" placeholder="johndoe" {...register('username')} />
+
+          <div className="login-error">{errors.username?.message}</div>
+        </div>
+
+        <div className="login-password-container">
+          <label>Password:</label>
+
+          <input type="password" {...register('password')} />
+
+          <div className="login-error">{errors.password?.message}</div>
+        </div>
+
+        {error && <div className="login-server-error">{error}</div>}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="login-submit-button"
+        >
+          Login
+        </button>
+      </form>
+    </>
   );
 };
 
