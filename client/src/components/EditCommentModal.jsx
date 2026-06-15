@@ -1,11 +1,22 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
 
+const schema = yup.object({
+  content: yup
+    .string()
+    .trim()
+    .required('Comment cannot be blank.')
+    .max(1000, 'Comment cannot be longer than 1000 characters.'),
+});
+
 const EditCommentModal = ({ comment, onClose, onCommentEdited }) => {
-  const [editedContent, setEditedContent] = useState(comment.content);
-  const [error, setError] = useState(null);
+  const [serverError, setServerError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { user } = useAuthContext();
@@ -13,28 +24,32 @@ const EditCommentModal = ({ comment, onClose, onCommentEdited }) => {
 
   const userOwnsComment = user.id === comment.user_id;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      content: comment.content || '',
+    },
+  });
 
+  const onSubmit = async (formData) => {
     try {
       setIsLoading(true);
-      setError(null);
+      setServerError(null);
 
       if (!userOwnsComment) {
-        setError('You cannot edit this comment.');
-        return;
-      }
-
-      const trimmedContent = editedContent.trim();
-
-      if (!trimmedContent) {
-        setError('Comment cannot be blank.');
+        setServerError('You cannot edit this comment.');
         return;
       }
 
       const response = await apiFetch(`/api/comment/edit/${comment.id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ content: trimmedContent }),
+        body: JSON.stringify({
+          content: formData.content.trim(),
+        }),
       });
 
       if (!response) return;
@@ -42,14 +57,14 @@ const EditCommentModal = ({ comment, onClose, onCommentEdited }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setServerError(data.error || 'Failed to edit comment.');
         return;
       }
 
       onCommentEdited?.(data.comment);
       onClose();
     } catch {
-      setError('Something went wrong.');
+      setServerError('Something went wrong.');
     } finally {
       setIsLoading(false);
     }
@@ -60,16 +75,18 @@ const EditCommentModal = ({ comment, onClose, onCommentEdited }) => {
       <div className="modal-backdrop" onClick={onClose} />
 
       <div className="modal">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <h3>Edit Comment</h3>
 
           <textarea
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
             placeholder="Edit your comment..."
+            disabled={isLoading}
+            {...register('content')}
           />
 
-          {error && <div className="modal-error">{error}</div>}
+          <div className="modal-error">{errors.content?.message}</div>
+
+          {serverError && <div className="modal-error">{serverError}</div>}
 
           <div className="modal-actions">
             <button type="submit" disabled={isLoading}>
