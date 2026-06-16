@@ -1,5 +1,6 @@
 const { prisma } = require('../../lib/prisma.mjs');
 const { validate: isUUID } = require("uuid");
+const cloudinary = require('../config/cloudinary');
 
 async function getUser(req, res, next) {
     try {
@@ -205,64 +206,56 @@ async function updateUser(req, res, next) {
             last_name,
             username,
             profile_picture_url,
+            profile_picture_public_id,
         } = req.body;
 
         if (id !== userId) {
             return res.sendStatus(403);
         }
 
+        const existingUser = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                profile_picture_public_id: true,
+            },
+        });
+
+        if (!existingUser) {
+            return res.status(404).json({
+                error: 'User not found',
+            });
+        }
+
         const data = {};
 
         if (first_name !== undefined) {
-            const trimmed = first_name.trim();
-
-            if (!trimmed) {
-                return res.status(400).json({
-                    error: "First name cannot be empty",
-                });
-            }
-
-            data.first_name = trimmed;
+            data.first_name = first_name.trim();
         }
 
         if (last_name !== undefined) {
-            const trimmed = last_name.trim();
-
-            if (!trimmed) {
-                return res.status(400).json({
-                    error: "Last name cannot be empty",
-                });
-            }
-
-            data.last_name = trimmed;
+            data.last_name = last_name.trim();
         }
 
         if (username !== undefined) {
-            const trimmed = username.trim();
-
-            if (!trimmed) {
-                return res.status(400).json({
-                    error: "Username cannot be empty",
-                });
-            }
-
-            data.username = trimmed;
+            data.username = username.trim();
         }
 
         if (profile_picture_url !== undefined) {
             data.profile_picture_url = profile_picture_url;
         }
 
+        if (profile_picture_public_id !== undefined) {
+            data.profile_picture_public_id = profile_picture_public_id;
+        }
+
         if (Object.keys(data).length === 0) {
             return res.status(400).json({
-                error: "No changes were made",
+                error: 'No changes were made',
             });
         }
 
         const updatedUser = await prisma.user.update({
-            where: {
-                id,
-            },
+            where: { id },
             data,
             select: {
                 id: true,
@@ -270,19 +263,29 @@ async function updateUser(req, res, next) {
                 first_name: true,
                 last_name: true,
                 profile_picture_url: true,
+                profile_picture_public_id: true,
                 created_at: true,
             },
         });
 
+        if (
+            profile_picture_public_id &&
+            existingUser.profile_picture_public_id &&
+            existingUser.profile_picture_public_id !== profile_picture_public_id
+        ) {
+            await cloudinary.uploader.destroy(
+                existingUser.profile_picture_public_id,
+            );
+        }
+
         return res.status(200).json({
-            message: "Profile updated",
+            message: 'Profile updated',
             user: updatedUser,
         });
-
     } catch (error) {
-        if (error.code === "P2002") {
+        if (error.code === 'P2002') {
             return res.status(409).json({
-                error: "Username already taken",
+                error: 'Username already taken',
             });
         }
 
