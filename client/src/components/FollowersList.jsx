@@ -185,7 +185,7 @@ const FollowersList = ({ onClose }) => {
     <>
       <div className="modal-backdrop" onClick={onClose} />
 
-      <div className="modal">
+      <div className="modal user-list-modal">
         <div className="modal-header">
           <h3>Followers</h3>
 
