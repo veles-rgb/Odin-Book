@@ -13,6 +13,9 @@ import Tooltip from './Tooltip';
 
 import { formatDateTime } from '../utils/formatDateTime';
 
+const DEFAULT_AVATAR =
+  'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg';
+
 const PostCard = ({
   post,
   onPostDeleted,
@@ -25,7 +28,7 @@ const PostCard = ({
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
-  const HandleShowComments = () => {
+  const handleShowComments = () => {
     setViewComments((prev) => !prev);
   };
 
@@ -38,10 +41,7 @@ const PostCard = ({
         <a href={`/profile/${post.user.id}`}>
           <img
             className={styles.avatar}
-            src={
-              post.user.profile_picture_url ||
-              'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg'
-            }
+            src={post.user.profile_picture_url || DEFAULT_AVATAR}
             alt={`${post.user.username}'s profile picture`}
           />
         </a>
@@ -55,6 +55,7 @@ const PostCard = ({
             <div className={styles.timestamp}>
               {formatDateTime(post.created_at)}
             </div>
+
             {postHasBeenUpdated && (
               <Tooltip content={`Updated: ${formatDateTime(post.updated_at)}`}>
                 <FaRegClock />
@@ -84,8 +85,19 @@ const PostCard = ({
 
       <div className={styles.content}>{post.content}</div>
 
+      {post.media_url && (
+        <div className={styles.mediaWrapper}>
+          <img
+            className={styles.media}
+            src={post.media_url}
+            alt="Post media"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       <div className={styles.footer}>
-        <button className={styles.commentsButton} onClick={HandleShowComments}>
+        <button className={styles.commentsButton} onClick={handleShowComments}>
           {viewComments
             ? 'Hide comments'
             : post.commentCount > 0
@@ -94,12 +106,13 @@ const PostCard = ({
         </button>
 
         <LikeButton
-          target={'post'}
+          target="post"
           targetId={post.id}
           likedByMe={post.likedByMe}
           likeCount={post.likeCount}
         />
       </div>
+
       {viewComments && <CommentSection postId={post.id} />}
 
       {showEditModal && (
