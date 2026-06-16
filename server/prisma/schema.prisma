@@ -16,6 +16,7 @@ model User {
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
   profile_picture_url String?
+  profile_picture_public_id String?
 
   refreshTokens RefreshToken[]
   posts         Post[]
