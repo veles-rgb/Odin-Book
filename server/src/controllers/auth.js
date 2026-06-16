@@ -23,7 +23,7 @@ function generateRefreshToken(user) {
 
 async function registerUser(req, res, next) {
     try {
-        const { first_name, last_name, username, password } = req.body;
+        const { first_name, last_name, username, password, profile_picture_url, profile_picture_public_id } = req.body;
 
         const trimmedFirst = first_name?.trim();
         const trimmedLast = last_name?.trim();
@@ -41,6 +41,8 @@ async function registerUser(req, res, next) {
                 last_name: trimmedLast,
                 username: trimmedUsername,
                 hashed_password: hashedPassword,
+                profile_picture_url: profile_picture_url || null,
+                profile_picture_public_id: profile_picture_public_id || null,
             },
         });
 
@@ -75,7 +77,8 @@ async function registerUser(req, res, next) {
                 username: user.username,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                profile_picture_url: user.profile_picture_url
+                profile_picture_url: user.profile_picture_url,
+                profile_picture_public_id: user.profile_picture_public_id
             }
         });
 
