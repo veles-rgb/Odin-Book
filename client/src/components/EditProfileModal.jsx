@@ -1,6 +1,6 @@
 import styles from './styles/EditProfileModal.module.css';
 import { createPortal } from 'react-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -54,6 +54,14 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
   const [serverError, setServerError] = useState(null);
   const [imageSelected, setImageSelected] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+
+  useEffect(() => {
+    if (!imagePreview) return;
+
+    return () => {
+      URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const {
     register,
