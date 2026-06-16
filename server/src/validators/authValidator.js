@@ -35,6 +35,18 @@ const registerValidation = [
         .withMessage('Password must contain an uppercase letter.')
         .matches(/[0-9]/)
         .withMessage('Password must contain a number.'),
+
+    body('profile_picture_url')
+        .optional({ nullable: true, checkFalsy: true })
+        .trim()
+        .isURL()
+        .withMessage('Profile picture must be a valid URL.'),
+
+    body('profile_picture_public_id')
+        .optional({ nullable: true, checkFalsy: true })
+        .trim()
+        .isLength({ max: 255 })
+        .withMessage('Profile picture public ID is too long.'),
 ];
 
 const loginValidation = [
