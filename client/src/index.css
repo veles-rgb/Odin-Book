@@ -573,3 +573,21 @@ textarea {
     font-size: 0.9rem;
     font-weight: 500;
 }
+
+.avatarPreviewWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.avatarPreview {
+    width: 96px;
+    height: 96px;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    border: 2px solid var(--color-border, #e5e7eb);
+    background: var(--color-surface, #ffffff);
+}
