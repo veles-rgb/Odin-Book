@@ -9,7 +9,7 @@ export const useRegister = () => {
 
     const { login } = useAuthContext();
 
-    const registerUser = async (firstName, lastName, username, password) => {
+    const registerUser = async (firstName, lastName, username, password, profile_picture_url, profile_picture_public_id) => {
         try {
             setIsLoading(true);
             setError(null);
@@ -25,6 +25,8 @@ export const useRegister = () => {
                     last_name: lastName,
                     username,
                     password,
+                    profile_picture_url,
+                    profile_picture_public_id,
                 }),
             });
 
