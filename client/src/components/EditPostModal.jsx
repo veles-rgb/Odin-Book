@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import axios from 'axios';
 
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { FaRegImage } from 'react-icons/fa';
 
 const schema = yup.object({
   content: yup
@@ -18,6 +20,10 @@ const schema = yup.object({
 const EditPostModal = ({ post, onClose, onPostEdited }) => {
   const [serverError, setServerError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const fileInputRef = useRef(null);
+  const [imageSelected, setImageSelected] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
 
   const { user } = useAuthContext();
   const { apiFetch } = useApiFetch();
@@ -35,6 +41,33 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
     },
   });
 
+  useEffect(() => {
+    if (!imagePreview) return;
+
+    return () => {
+      URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
+  const uploadImageToCloudinary = async () => {
+    if (!imageSelected) return null;
+
+    const imageData = new FormData();
+
+    imageData.append('file', imageSelected);
+    imageData.append('upload_preset', 'val-media');
+
+    const response = await axios.post(
+      'https://api.cloudinary.com/v1_1/dz4v29v5h/image/upload',
+      imageData,
+    );
+
+    return {
+      url: response.data.secure_url,
+      publicId: response.data.public_id,
+    };
+  };
+
   const onSubmit = async (formData) => {
     try {
       setIsLoading(true);
@@ -51,10 +84,15 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
 
       if (!confirmed) return;
 
+      const uploadedImage = await uploadImageToCloudinary();
+
       const response = await apiFetch(`/api/post/edit/${post.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
           content: formData.content.trim(),
+          media_url: uploadedImage?.url || post.media_url || null,
+          media_public_id:
+            uploadedImage?.publicId || post.media_public_id || null,
         }),
       });
 
@@ -76,6 +114,28 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
     }
   };
 
+  const handleImageIconClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    setImageSelected(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    setImageSelected(null);
+    setImagePreview('');
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return createPortal(
     <>
       <div className="modal-backdrop" onClick={onClose} />
@@ -89,6 +149,45 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
             disabled={isLoading}
             {...register('content')}
           />
+
+          <div className="post-upload-actions">
+            <button
+              type="button"
+              className="image-upload-button"
+              onClick={handleImageIconClick}
+              disabled={isLoading}
+            >
+              <FaRegImage />
+              <span>Change image</span>
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
+          </div>
+
+          {(imagePreview || post.media_url) && (
+            <div className="post-image-preview-wrapper">
+              <img
+                src={imagePreview || post.media_url}
+                alt="Post preview"
+                className="post-image-preview"
+              />
+
+              <button
+                type="button"
+                className="remove-image-button"
+                onClick={handleRemoveImage}
+                disabled={isLoading}
+              >
+                Remove image
+              </button>
+            </div>
+          )}
 
           <div className="modal-error">{errors.content?.message}</div>
 
