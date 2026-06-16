@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import axios from 'axios';
 
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -51,6 +52,8 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState(null);
+  const [imageSelected, setImageSelected] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
 
   const {
     register,
@@ -72,10 +75,31 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
     name: 'profile_picture_url',
   });
 
+  const uploadImageToCloudinary = async () => {
+    if (!imageSelected) return null;
+
+    const imageData = new FormData();
+
+    imageData.append('file', imageSelected);
+    imageData.append('upload_preset', 'val-pfp');
+
+    const response = await axios.post(
+      'https://api.cloudinary.com/v1_1/dz4v29v5h/image/upload',
+      imageData,
+    );
+
+    return {
+      url: response.data.secure_url,
+      publicId: response.data.public_id,
+    };
+  };
+
   const onSubmit = async (formData) => {
     try {
       setIsLoading(true);
       setServerError(null);
+
+      const uploadedImage = await uploadImageToCloudinary();
 
       const response = await apiFetch(`/api/user/update/${user.id}`, {
         method: 'PATCH',
@@ -83,7 +107,12 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           username: formData.username.trim(),
-          profile_picture_url: formData.profile_picture_url || null,
+          profile_picture_url:
+            uploadedImage?.url || formData.profile_picture_url || null,
+          profile_picture_public_id:
+            uploadedImage?.publicId ||
+            profile.profile_picture_public_id ||
+            null,
         }),
       });
 
@@ -105,6 +134,19 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) {
+      setImageSelected(null);
+      setImagePreview('');
+      return;
+    }
+
+    setImageSelected(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
   return createPortal(
     <>
       <div className="modal-backdrop" onClick={onClose} />
@@ -116,7 +158,7 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
           <div className={styles.avatarPreviewWrapper}>
             <img
               className={styles.avatarPreview}
-              src={profilePictureUrl || DEFAULT_AVATAR}
+              src={imagePreview || profilePictureUrl || DEFAULT_AVATAR}
               alt="Profile preview"
             />
           </div>
@@ -168,6 +210,17 @@ const EditProfileModal = ({ profile, onUpdate, onClose }) => {
             <div className={styles.fieldError}>
               {errors.profile_picture_url?.message}
             </div>
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label htmlFor="profile-picture-file">Or upload image</label>
+            <input
+              id="profile-picture-file"
+              type="file"
+              accept="image/*"
+              disabled={isLoading}
+              onChange={handleImageChange}
+            />
           </div>
 
           {serverError && <div className="modal-error">{serverError}</div>}
