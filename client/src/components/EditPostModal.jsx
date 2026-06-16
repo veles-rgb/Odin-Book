@@ -24,6 +24,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
   const fileInputRef = useRef(null);
   const [imageSelected, setImageSelected] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [removeImage, setRemoveImage] = useState(false);
 
   const { user } = useAuthContext();
   const { apiFetch } = useApiFetch();
@@ -55,7 +56,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
     const imageData = new FormData();
 
     imageData.append('file', imageSelected);
-    imageData.append('upload_preset', 'val-media');
+    imageData.append('upload_preset', 'vel-media');
 
     const response = await axios.post(
       'https://api.cloudinary.com/v1_1/dz4v29v5h/image/upload',
@@ -86,13 +87,20 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
 
       const uploadedImage = await uploadImageToCloudinary();
 
+      const finalMediaUrl = removeImage
+        ? null
+        : uploadedImage?.url || post.media_url || null;
+
+      const finalMediaPublicId = removeImage
+        ? null
+        : uploadedImage?.publicId || post.media_public_id || null;
+
       const response = await apiFetch(`/api/post/edit/${post.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
           content: formData.content.trim(),
-          media_url: uploadedImage?.url || post.media_url || null,
-          media_public_id:
-            uploadedImage?.publicId || post.media_public_id || null,
+          media_url: finalMediaUrl,
+          media_public_id: finalMediaPublicId,
         }),
       });
 
@@ -123,6 +131,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
 
     if (!file) return;
 
+    setRemoveImage(false);
     setImageSelected(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -130,6 +139,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
   const handleRemoveImage = () => {
     setImageSelected(null);
     setImagePreview('');
+    setRemoveImage(true);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -158,7 +168,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
               disabled={isLoading}
             >
               <FaRegImage />
-              <span>Change image</span>
+              <span>{post.media_url ? 'Change image' : 'Add image'}</span>
             </button>
 
             <input
@@ -170,7 +180,7 @@ const EditPostModal = ({ post, onClose, onPostEdited }) => {
             />
           </div>
 
-          {(imagePreview || post.media_url) && (
+          {(imagePreview || (!removeImage && post.media_url)) && (
             <div className="post-image-preview-wrapper">
               <img
                 src={imagePreview || post.media_url}

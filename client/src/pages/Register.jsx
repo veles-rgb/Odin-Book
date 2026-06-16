@@ -80,7 +80,7 @@ const Register = () => {
     const imageData = new FormData();
 
     imageData.append('file', imageSelected);
-    imageData.append('upload_preset', 'val-pfp');
+    imageData.append('upload_preset', 'vel-pfp');
 
     const response = await axios.post(
       'https://api.cloudinary.com/v1_1/dz4v29v5h/image/upload',
