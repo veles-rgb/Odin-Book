@@ -48,6 +48,8 @@ model Post {
   user_id    String   @db.Uuid
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   content    String
+  media_url String?
+  media_public_id String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
