@@ -58,6 +58,12 @@ const Login = () => {
         >
           Login
         </button>
+        <p>
+          Don't have an account?{' '}
+          <a href="/register" style={{ color: 'var(--color-brand)' }}>
+            Register
+          </a>
+        </p>
       </form>
     </>
   );

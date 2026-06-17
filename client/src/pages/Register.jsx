@@ -196,6 +196,13 @@ const Register = () => {
 
       {error && <div className="register-error">{error}</div>}
       {isLoading && <IsLoading message="Creating account..." />}
+
+      <p>
+        Already have an account?{' '}
+        <a href="/login" style={{ color: 'var(--color-brand)' }}>
+          Login
+        </a>
+      </p>
     </form>
   );
 };
