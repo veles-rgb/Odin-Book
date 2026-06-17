@@ -283,9 +283,70 @@ async function logoutUser(req, res, next) {
     }
 }
 
+const changePassword = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                error: 'Current password and new password are required.',
+            });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                hashed_password: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const passwordsMatch = await bcrypt.compare(
+            currentPassword,
+            user.hashed_password
+        );
+
+        if (!passwordsMatch) {
+            return res.status(401).json({ error: 'Current password is incorrect.' });
+        }
+
+        const samePassword = await bcrypt.compare(
+            newPassword,
+            user.hashed_password
+        );
+
+        if (samePassword) {
+            return res.status(400).json({
+                error: 'New password must be different from current password.',
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                hashed_password: hashedPassword,
+            },
+        });
+
+        return res.status(200).json({
+            message: 'Password has been updated.',
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     createAccessToken,
     logoutUser,
+    changePassword,
 };
