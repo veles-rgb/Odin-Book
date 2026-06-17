@@ -60,7 +60,29 @@ const loginValidation = [
         .withMessage('Password is required.'),
 ];
 
+const changePasswordValidation = [
+    body('currentPassword')
+        .trim()
+        .notEmpty()
+        .withMessage('Current password is required.'),
+
+    body('newPassword')
+        .isString()
+        .withMessage('New password must be a string.')
+        .notEmpty()
+        .withMessage('New password is required.')
+        .isLength({ min: 8, max: 128 })
+        .withMessage('New password must be between 8 and 128 characters long.')
+        .matches(/[a-z]/)
+        .withMessage('New password must contain a lowercase letter.')
+        .matches(/[A-Z]/)
+        .withMessage('New password must contain an uppercase letter.')
+        .matches(/[0-9]/)
+        .withMessage('New password must contain a number.'),
+];
+
 module.exports = {
     registerValidation,
     loginValidation,
+    changePasswordValidation,
 };
