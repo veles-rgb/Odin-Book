@@ -44,9 +44,15 @@ const LikeButton = ({ target, targetId, likedByMe, likeCount }) => {
   };
 
   return (
-    <button onClick={performAction} disabled={isLoading}>
-      {liked ? <BiSolidLike /> : <BiLike />}
-      <span>{likes}</span>
+    <button onClick={performAction} disabled={isLoading} className="likeButton">
+      {liked ? (
+        <BiSolidLike style={{ color: 'var(--color-brand)' }} />
+      ) : (
+        <BiLike style={{ color: 'black' }} />
+      )}
+      <span style={{ color: liked ? 'var(--color-brand)' : 'black' }}>
+        {likes}
+      </span>
       {error && <span>{error}</span>}
     </button>
   );
