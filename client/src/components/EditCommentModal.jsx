@@ -89,11 +89,16 @@ const EditCommentModal = ({ comment, onClose, onCommentEdited }) => {
           {serverError && <div className="modal-error">{serverError}</div>}
 
           <div className="modal-actions">
-            <button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Save Changes'}
+            <button type="submit" disabled={isLoading} className="actionButton">
+              {isLoading ? 'Saving...' : 'Save'}
             </button>
 
-            <button type="button" onClick={onClose} disabled={isLoading}>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isLoading}
+              className="cancelButton"
+            >
               Cancel
             </button>
           </div>

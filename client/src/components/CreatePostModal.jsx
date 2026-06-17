@@ -188,11 +188,20 @@ const CreatePostModal = ({ onClose, onPostCreated }) => {
           {postError && <div className="modal-error">{postError}</div>}
 
           <div className="modal-actions">
-            <button type="submit" disabled={postIsLoading}>
+            <button
+              type="submit"
+              className="actionButton"
+              disabled={postIsLoading}
+            >
               {postIsLoading ? 'Posting...' : 'Post'}
             </button>
 
-            <button type="button" disabled={postIsLoading} onClick={onClose}>
+            <button
+              type="button"
+              className="cancelButton"
+              disabled={postIsLoading}
+              onClick={onClose}
+            >
               Cancel
             </button>
           </div>

@@ -123,7 +123,11 @@ const CommentSection = ({ postId }) => {
             <div className={styles.formError}>{userCommentError}</div>
           )}
 
-          <button type="submit" disabled={userCommentLoading}>
+          <button
+            type="submit"
+            disabled={userCommentLoading}
+            className="actionButton"
+          >
             {userCommentLoading ? 'Sending...' : 'Send'}
           </button>
         </form>

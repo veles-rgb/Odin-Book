@@ -100,11 +100,20 @@ const ResetPasswordModal = ({ onClose, onPasswordChanged }) => {
           {serverError && <div className="modal-error">{serverError}</div>}
 
           <div className="modal-actions">
-            <button type="submit" disabled={isLoading || isSubmitting}>
-              {isSubmitting || isLoading ? 'Updating...' : 'Update password'}
+            <button
+              type="submit"
+              disabled={isLoading || isSubmitting}
+              className="actionButton"
+            >
+              {isSubmitting || isLoading ? 'Updating...' : 'Update'}
             </button>
 
-            <button type="button" disabled={isLoading} onClick={onClose}>
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={onClose}
+              className="cancelButton"
+            >
               Cancel
             </button>
           </div>

@@ -186,7 +186,7 @@ const Comment = ({ comment, onCommentDelete, onCommentEdited }) => {
           )}
 
           <button
-            className={styles.replySubmitButton}
+            className={`actionButton ${styles.replySubmitButton}`}
             type="submit"
             disabled={userReplyLoading}
           >

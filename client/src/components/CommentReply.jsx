@@ -153,7 +153,7 @@ const CommentReply = ({
       <div className={styles.actions}>
         <button
           type="button"
-          className={styles.replyButton}
+          className={`${styles.replyButton}`}
           onClick={handleShowReply}
         >
           Reply
@@ -188,7 +188,7 @@ const CommentReply = ({
 
             <button
               type="submit"
-              className={styles.sendButton}
+              className={`actionButton ${styles.sendButton}`}
               disabled={userReplyLoading}
             >
               {userReplyLoading ? 'Sending...' : 'Send'}
