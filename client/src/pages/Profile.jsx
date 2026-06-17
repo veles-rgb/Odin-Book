@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useApiFetch } from '../hooks/useApiFetch';
 import { useAuthContext } from '../hooks/useAuthContext';
 import styles from './styles/Profile.module.css';
+import settingsMenuStyles from '../components/styles/SettingsMenu.module.css';
 import { formatDateTime } from '../utils/formatDateTime';
+
 import { FaRegClock } from 'react-icons/fa';
 
 import Tooltip from '../components/Tooltip';
@@ -12,6 +14,9 @@ import CreatePostModal from '../components/CreatePostModal';
 import EditProfileModal from '../components/EditProfileModal';
 import FollowersList from '../components/FollowersList';
 import FollowingList from '../components/FollowingList';
+import SettingsMenu from '../components/SettingsMenu';
+import ResetPasswordModal from '../components/ResetPasswordModal';
+import Notification from '../components/Notification';
 
 const Profile = () => {
   const { identifier } = useParams();
@@ -36,6 +41,10 @@ const Profile = () => {
   const [showFollowing, setShowFollowing] = useState(false);
   const [showRemoveFollowerConfirm, setShowRemoveFollowerConfirm] =
     useState(false);
+
+  const [showResetPassword, setShowResetPassword] = useState(false);
+
+  const [notification, setNotification] = useState('');
 
   const { apiFetch } = useApiFetch();
 
@@ -436,9 +445,35 @@ const Profile = () => {
                       {relationshipError}
                     </div>
                   )}
+
+                  {profileBelongsToUser && (
+                    <SettingsMenu>
+                      <button
+                        className={`${styles.resetPwdBtn} ${settingsMenuStyles.resetPwdBtn}`}
+                        onClick={() => setShowResetPassword((prev) => !prev)}
+                      >
+                        Reset Password
+                      </button>
+                    </SettingsMenu>
+                  )}
+
+                  {showResetPassword && (
+                    <ResetPasswordModal
+                      onClose={() => setShowResetPassword(false)}
+                      onPasswordChanged={() => {
+                        setNotification('Password updated successfully.');
+                      }}
+                    />
+                  )}
+
+                  {notification && (
+                    <Notification
+                      message={notification}
+                      onClose={() => setNotification('')}
+                    />
+                  )}
                 </div>
               </div>
-
               <div className={styles.stats}>
                 <div
                   className={styles.statItem}
