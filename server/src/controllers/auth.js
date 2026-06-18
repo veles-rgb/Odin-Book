@@ -298,12 +298,17 @@ const changePassword = async (req, res, next) => {
             where: { id: userId },
             select: {
                 id: true,
+                username: true,
                 hashed_password: true,
             },
         });
 
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
+        }
+
+        if (user.username === 'guest') {
+            return res.status(400).json({ error: 'You cannot modify the guest account.' });
         }
 
         const passwordsMatch = await bcrypt.compare(

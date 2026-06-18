@@ -217,6 +217,7 @@ async function updateUser(req, res, next) {
             where: { id },
             select: {
                 profile_picture_public_id: true,
+                username: true
             },
         });
 
@@ -224,6 +225,10 @@ async function updateUser(req, res, next) {
             return res.status(404).json({
                 error: 'User not found',
             });
+        }
+
+        if (existingUser.username === 'guest') {
+            return res.status(400).json({ error: 'You cannot modify the guest account.' });
         }
 
         const data = {};
