@@ -13,10 +13,13 @@
 
     padding: 0.4rem 0.6rem;
 
-    background: #111827;
-    color: white;
+    background: var(--color-text-primary);
+    color: var(--color-text-inverse);
 
-    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    box-shadow: var(--shadow-sm);
 
     font-size: 0.8rem;
     white-space: nowrap;
@@ -24,9 +27,9 @@
     opacity: 0;
     pointer-events: none;
 
-    transition: opacity 0.15s ease;
+    transition: opacity var(--transition-fast);
 
-    z-index: 100;
+    z-index: var(--z-dropdown);
 }
 
 .wrapper:hover .tooltip {

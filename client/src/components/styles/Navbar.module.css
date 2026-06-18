@@ -2,12 +2,14 @@
     width: 100%;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: var(--z-sticky);
 
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
+    background: var(--color-header-bg);
 
-    border-bottom: 1px solid #e5e7eb;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid var(--color-brand);
 }
 
 .container {
@@ -22,7 +24,7 @@
 
 .logoLink {
     text-decoration: none;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .logo {
@@ -51,33 +53,33 @@
 
     padding: 0.55rem 0.9rem;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
     font-weight: 600;
     font-size: 0.95rem;
 
     transition:
-        background-color 0.15s ease,
-        color 0.15s ease,
-        transform 0.15s ease;
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .loginLink {
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 .loginLink:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
 }
 
 .registerLink {
-    background: #111827;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
 }
 
 .registerLink:hover {
-    background: #1f2937;
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
@@ -106,19 +108,19 @@
     align-items: center;
     justify-content: center;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
-    color: #374151;
+    color: var(--color-text-secondary);
     cursor: pointer;
 
     transition:
-        background-color 0.15s ease,
-        color 0.15s ease;
+        background-color var(--transition-fast),
+        color var(--transition-fast);
 }
 
 .activityButton:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
 }
 
 .activityBell {
@@ -139,10 +141,10 @@
     align-items: center;
     justify-content: center;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
-    background: #dc2626;
-    color: white;
+    background: var(--color-error);
+    color: var(--color-text-inverse);
 
     font-size: 0.7rem;
     font-weight: 800;
@@ -156,21 +158,21 @@
 
     padding: 0.3rem 0.45rem 0.3rem 0.75rem;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
     text-decoration: none;
-    color: #111827;
+    color: var(--color-text-primary);
 
-    transition: background-color 0.15s ease;
+    transition: background-color var(--transition-fast);
 }
 
 .profileLink:hover {
-    background: #f3f4f6;
+    background: var(--color-surface-hover);
 }
 
 .username {
     font-weight: 600;
-    color: #374151;
+    color: var(--color-text-secondary);
 }
 
 .avatar {
@@ -180,26 +182,26 @@
     border-radius: 50%;
     object-fit: cover;
 
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--color-border);
 }
 
 .logoutButton {
     border: none;
 
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--color-error-bg);
+    color: var(--color-error);
 
     cursor: pointer;
 }
 
 .logoutButton:hover {
-    background: #fecaca;
-    color: #991b1b;
+    background: var(--color-error-bg-hover);
+    color: var(--color-error-text);
 }
 
 .searchButton:hover {
     cursor: pointer;
-    color: rgb(128, 128, 251);
+    color: var(--color-brand);
 }
 
 @media (max-width: 600px) {
@@ -214,4 +216,14 @@
     .logoutButton {
         padding: 0.5rem 0.75rem;
     }
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.themeButton {
+    margin-left: auto;
 }

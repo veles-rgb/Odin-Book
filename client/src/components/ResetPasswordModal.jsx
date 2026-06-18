@@ -67,6 +67,7 @@ const ResetPasswordModal = ({ onClose, onPasswordChanged }) => {
 
   return createPortal(
     <>
+      <div className="modal-backdrop" onClick={onClose} />
       <div className={`modal ${styles.resetPasswordModal}`}>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <h3>Reset password</h3>

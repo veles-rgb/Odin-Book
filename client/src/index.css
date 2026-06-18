@@ -1,119 +1,3 @@
-:root {
-    /* =========================
-     SURFACES
-  ========================= */
-
-    --color-background: #f9fafb;
-    --color-surface: #ffffff;
-    --color-surface-hover: #f3f4f6;
-
-    /* =========================
-     TEXT
-  ========================= */
-
-    --color-text-primary: #111827;
-    --color-text-secondary: #374151;
-    --color-text-muted: #6b7280;
-    --color-text-inverse: #ffffff;
-
-    /* =========================
-     BORDERS
-  ========================= */
-
-    --color-border: #e5e7eb;
-    --color-border-hover: #d1d5db;
-
-    /* =========================
-     BRAND
-  ========================= */
-
-    --color-brand: #2563eb;
-    --color-brand-hover: #1d4ed8;
-    --color-brand-bg: #dbeafe;
-    --color-brand-border: #93c5fd;
-    --color-brand-text: #1e40af;
-
-    /* =========================
-     PRIMARY
-  ========================= */
-
-    --color-primary: #111827;
-    --color-primary-hover: #1f2937;
-
-    /* =========================
-     SUCCESS
-  ========================= */
-
-    --color-success: #16a34a;
-    --color-success-hover: #15803d;
-    --color-success-bg: #dcfce7;
-    --color-success-border: #86efac;
-    --color-success-text: #166534;
-
-    /* =========================
-     ERROR / DANGER
-  ========================= */
-
-    --color-error: #dc2626;
-    --color-error-hover: #b91c1c;
-    --color-error-bg: #fee2e2;
-    --color-error-bg-hover: #fecaca;
-    --color-error-border: #fca5a5;
-    --color-error-text: #991b1b;
-
-    /* =========================
-     WARNING
-  ========================= */
-
-    --color-warning: #d97706;
-    --color-warning-bg: #fef3c7;
-    --color-warning-border: #fcd34d;
-    --color-warning-text: #92400e;
-
-    /* =========================
-     INFO
-  ========================= */
-
-    --color-info: #2563eb;
-    --color-info-bg: #dbeafe;
-    --color-info-border: #93c5fd;
-    --color-info-text: #1e40af;
-
-    /* =========================
-     INPUTS
-  ========================= */
-
-    --color-input-bg: #ffffff;
-    --color-input-border: #d1d5db;
-    --color-input-focus: #111827;
-
-    /* =========================
-     SHADOWS
-  ========================= */
-
-    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-lg:
-        0 18px 40px rgba(0, 0, 0, 0.14),
-        0 4px 12px rgba(0, 0, 0, 0.08);
-
-    /* =========================
-     BORDER RADIUS
-  ========================= */
-
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 14px;
-    --radius-pill: 999px;
-
-    /* =========================
-     TRANSITIONS
-  ========================= */
-
-    --transition-fast: 150ms ease;
-    --transition-normal: 200ms ease;
-}
-
 /* =========================
    BASE RESET
 ========================= */
@@ -142,61 +26,121 @@ textarea {
     font: inherit;
 }
 
-/* ===========
-GLOBAL BUTTONS
-============== */
+input,
+textarea,
+select {
+    background: var(--color-input-bg);
+    color: var(--color-input-text);
+
+    border: 1px solid var(--color-input-border);
+
+    transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        background-color var(--transition-normal);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-input-placeholder);
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+    border-color: var(--color-input-border-hover);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+
+    border-color: var(--color-input-focus);
+
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+    background: var(--color-input-disabled-bg);
+    color: var(--color-input-disabled-text);
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   GLOBAL BUTTONS
+========================= */
+
 .likeButton {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.2rem;
-    background-color: white;
+
     border: none;
+
+    background-color: var(--color-surface);
+    color: var(--color-text-secondary);
+
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.actionButton {
-    background-color: white;
-    border: 2px solid var(--color-brand);
+.likeButton:hover {
     color: var(--color-brand);
-    border-radius: 4px;
+    cursor: pointer;
+}
+
+.actionButton {
     width: 4rem;
     height: 2rem;
+
+    border: 2px solid var(--color-brand);
+    border-radius: 4px;
+
+    background-color: var(--color-surface);
+    color: var(--color-brand);
 }
 
 .actionButton:hover {
-    cursor: pointer;
     background-color: var(--color-brand);
-    color: white;
+    color: var(--color-text-inverse);
+    cursor: pointer;
 }
 
 .cancelButton {
-    background-color: white;
-    border: 2px solid var(--color-warning);
-    color: var(--color-warning);
-    border-radius: 4px;
     width: 4rem;
     height: 2rem;
+
+    border: 2px solid var(--color-warning);
+    border-radius: 4px;
+
+    background-color: var(--color-surface);
+    color: var(--color-warning);
 }
 
 .cancelButton:hover {
-    cursor: pointer;
     background-color: var(--color-warning);
-    color: white;
+    color: var(--color-text-inverse);
+    cursor: pointer;
 }
 
 .dangerButton {
-    background-color: white;
-    border: 2px solid var(--color-error);
-    color: var(--color-error);
-    border-radius: 4px;
     height: 2rem;
+
+    border: 2px solid var(--color-error);
+    border-radius: 4px;
+
+    background-color: var(--color-surface);
+    color: var(--color-error);
 }
 
 .dangerButton:hover {
-    cursor: pointer;
     background-color: var(--color-error);
-    color: white;
+    color: var(--color-text-inverse);
+    cursor: pointer;
 }
 
 /* =========================
@@ -251,7 +195,7 @@ GLOBAL BUTTONS
     position: fixed;
     inset: 0;
 
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-overlay);
 
     z-index: 999;
 }
@@ -265,18 +209,18 @@ GLOBAL BUTTONS
     top: 50%;
     left: 50%;
 
-    transform: translate(-50%, -50%);
-
     width: min(90vw, 700px);
-
     padding: 1.5rem;
 
+    transform: translate(-50%, -50%);
+
     background: var(--color-surface);
+    color: var(--color-text-primary);
+
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
 
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.2),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-lg);
 
     z-index: 1000;
 
@@ -285,6 +229,8 @@ GLOBAL BUTTONS
 
 .modal h3 {
     margin: 0 0 1rem;
+
+    color: var(--color-text-primary);
 }
 
 .modal form {
@@ -296,7 +242,6 @@ GLOBAL BUTTONS
 .modal input,
 .modal textarea {
     width: 100%;
-
     padding: 0.75rem;
 
     border: 1px solid var(--color-input-border);
@@ -308,16 +253,16 @@ GLOBAL BUTTONS
     outline: none;
 
     transition:
-        border-color 0.2s ease,
-        opacity 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--transition-normal),
+        opacity var(--transition-normal),
+        box-shadow var(--transition-normal);
 }
 
 .modal input:focus,
 .modal textarea:focus {
     border-color: var(--color-input-focus);
 
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
 
 .modal input:disabled,
@@ -342,15 +287,17 @@ GLOBAL BUTTONS
     gap: 0.4rem;
 
     border: none;
-    background: transparent;
-    cursor: pointer;
 
-    color: #4b5563;
+    background: transparent;
+    color: var(--color-text-muted);
+
     font-weight: 600;
+
+    cursor: pointer;
 }
 
 .image-upload-button:hover {
-    color: #111827;
+    color: var(--color-brand);
 }
 
 .post-image-preview-wrapper {
@@ -360,8 +307,10 @@ GLOBAL BUTTONS
 .post-image-preview {
     width: 100%;
     max-height: 320px;
+
     object-fit: cover;
-    border-radius: 12px;
+
+    border-radius: var(--radius-md);
 }
 
 /* =========================
@@ -389,12 +338,12 @@ GLOBAL BUTTONS
 
 .modal-close-button {
     border: none;
+
     background: transparent;
+    color: var(--color-text-muted);
 
     font-size: 1.5rem;
     line-height: 1;
-
-    color: var(--color-text-muted);
 
     cursor: pointer;
 }
@@ -445,7 +394,7 @@ GLOBAL BUTTONS
 }
 
 .user-list {
-    list-style: none;
+    max-height: calc(80vh - 110px);
 
     display: flex;
     flex-direction: column;
@@ -454,8 +403,9 @@ GLOBAL BUTTONS
     padding: 0 0.25rem 0 0;
     margin: 1rem 0 0;
 
+    list-style: none;
+
     overflow-y: auto;
-    max-height: calc(80vh - 110px);
 }
 
 .user-list-item {
@@ -525,6 +475,7 @@ GLOBAL BUTTONS
     border-radius: var(--radius-pill);
 
     font-weight: 600;
+
     cursor: pointer;
 }
 
@@ -555,29 +506,36 @@ GLOBAL BUTTONS
 /* =========================
    LOGIN / REGISTER FORM STYLES
 ========================= */
+
 .register-form,
 .login-form {
     width: 100%;
     max-width: 450px;
-    margin: 3rem auto;
-    padding: 2rem;
 
     display: flex;
     flex-direction: column;
     gap: 1rem;
 
-    background: var(--color-surface, #ffffff);
-    border: 1px solid var(--color-border, #e5e7eb);
-    border-radius: 12px;
+    margin: 3rem auto;
+    padding: 2rem;
 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-md);
 }
 
 .register-form h3,
 .login-form h3 {
     margin: 0 0 1rem;
+
     text-align: center;
     font-size: 1.75rem;
+
+    color: var(--color-text-primary);
 }
 
 .register-form>div,
@@ -589,6 +547,8 @@ GLOBAL BUTTONS
 
 .register-form label,
 .login-form label {
+    color: var(--color-text-secondary);
+
     font-size: 0.95rem;
     font-weight: 600;
 }
@@ -598,22 +558,26 @@ GLOBAL BUTTONS
     width: 100%;
     padding: 0.75rem 1rem;
 
-    border: 1px solid var(--color-border, #d1d5db);
-    border-radius: 8px;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-sm);
+
+    background: var(--color-input-bg);
+    color: var(--color-text-primary);
 
     font-size: 1rem;
 
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal);
 }
 
 .register-form input:focus,
 .login-form input:focus {
     outline: none;
-    border-color: #3b82f6;
 
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    border-color: var(--color-input-focus);
+
+    box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
 }
 
 .register-form button,
@@ -622,25 +586,25 @@ GLOBAL BUTTONS
     padding: 0.85rem;
 
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
+
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
 
     font-size: 1rem;
     font-weight: 600;
 
     cursor: pointer;
 
-    background: #111827;
-    color: white;
-
     transition:
-        background 0.2s ease,
-        transform 0.1s ease,
-        opacity 0.2s ease;
+        background var(--transition-normal),
+        transform 100ms ease,
+        opacity var(--transition-normal);
 }
 
 .register-form button:hover,
 .login-form button:hover {
-    background: #2563eb;
+    background: var(--color-primary-hover);
 }
 
 .register-form button:active,
@@ -656,14 +620,14 @@ GLOBAL BUTTONS
 
 .register-form button:disabled:hover,
 .login-form button:disabled:hover {
-    background: #111827;
+    background: var(--color-primary);
 }
 
 .register-error,
 .login-error {
     min-height: 18px;
 
-    color: #dc2626;
+    color: var(--color-error);
     font-size: 0.875rem;
     font-weight: 500;
 }
@@ -671,10 +635,11 @@ GLOBAL BUTTONS
 .login-server-error {
     padding: 0.75rem 1rem;
 
-    border-radius: 8px;
+    border: 1px solid var(--color-error-border);
+    border-radius: var(--radius-sm);
 
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
 
     font-size: 0.9rem;
     font-weight: 500;
@@ -684,6 +649,7 @@ GLOBAL BUTTONS
     display: flex;
     justify-content: center;
     align-items: center;
+
     margin-bottom: 0.5rem;
 }
 
@@ -691,9 +657,10 @@ GLOBAL BUTTONS
     width: 96px;
     height: 96px;
 
+    border: 2px solid var(--color-border);
     border-radius: 50%;
-    object-fit: cover;
 
-    border: 2px solid var(--color-border, #e5e7eb);
-    background: var(--color-surface, #ffffff);
+    background: var(--color-surface);
+
+    object-fit: cover;
 }

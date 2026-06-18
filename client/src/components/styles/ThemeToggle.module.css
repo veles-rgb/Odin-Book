@@ -1,0 +1,71 @@
+.themeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: var(--radius-pill);
+
+    background: transparent;
+    color: var(--color-text-secondary);
+
+    font-size: 1.2rem;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.themeButton:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-brand);
+
+    transform: translateY(-1px);
+}
+
+.themeButton:active {
+    transform: translateY(0);
+}
+
+.themeButton {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: var(--radius-pill);
+
+    background: transparent;
+    color: var(--color-text-secondary);
+
+    font-size: 1.2rem;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+.themeButton:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-brand);
+
+    transform: translateY(-1px);
+}

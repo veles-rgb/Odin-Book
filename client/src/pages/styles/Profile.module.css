@@ -1,6 +1,7 @@
 .profileMain {
     width: 100%;
     max-width: 850px;
+
     margin: 0 auto;
     padding: 2rem 1rem;
 }
@@ -8,20 +9,28 @@
 .loading,
 .error {
     padding: 1rem;
+
     text-align: center;
+}
+
+.loading {
+    color: var(--color-text-muted);
 }
 
 .error,
 .relationshipError {
-    color: red;
+    color: var(--color-error);
 }
 
 .profileCard {
     padding: 1.5rem;
 
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-sm);
 }
 
 .profileContent {
@@ -33,19 +42,21 @@
 .avatar {
     width: 100px;
     height: 100px;
-
-    border-radius: 50%;
-    object-fit: cover;
     flex-shrink: 0;
+
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+
+    object-fit: cover;
 }
 
 .userInfo {
+    flex: 1;
+    min-width: 0;
+
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
-
-    flex: 1;
-    min-width: 0;
 }
 
 .nameRow {
@@ -57,23 +68,32 @@
 .displayName {
     margin: 0;
 
+    color: var(--color-text-primary);
+
     font-size: 1.4rem;
     font-weight: 700;
 }
 
 .joinedIcon {
-    color: #6b7280;
+    color: var(--color-text-muted);
+
     cursor: pointer;
+
+    transition: color var(--transition-fast);
+}
+
+.joinedIcon:hover {
+    color: var(--color-text-primary);
 }
 
 .username {
-    color: #6b7280;
+    color: var(--color-text-muted);
 }
 
 .relationshipInfo {
     display: flex;
-    gap: 0.5rem;
     flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .followsYou,
@@ -82,11 +102,12 @@
 
     padding: 0.25rem 0.5rem;
 
-    font-size: 0.8rem;
+    background: var(--color-surface-hover);
+    color: var(--color-text-secondary);
 
-    background: #f3f4f6;
-    border-radius: 999px;
-    color: #374151;
+    border-radius: var(--radius-pill);
+
+    font-size: 0.8rem;
 }
 
 .profileActions {
@@ -110,20 +131,36 @@
     padding: 0.5rem 0.9rem;
 
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 
     cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 .relationshipButton,
 .createPostButton {
-    background: #111827;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.relationshipButton:hover,
+.createPostButton:hover {
+    background: var(--color-primary-hover);
 }
 
 .secondaryButton {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+
+    border: 1px solid var(--color-border);
+}
+
+.secondaryButton:hover {
+    background: var(--color-border);
 }
 
 .relationshipButton:disabled,
@@ -145,26 +182,40 @@
 }
 
 .statItem {
+    min-width: 75px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    min-width: 75px;
+
     padding: 0.5rem;
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
 .statItem:hover {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-hover);
+
     cursor: pointer;
-    background-color: #f3f4f6;
 }
 
 .statNumber {
+    color: var(--color-text-primary);
+
     font-weight: 700;
 }
 
 .statLabel {
-    color: #6b7280;
+    color: var(--color-text-muted);
+
     font-size: 0.85rem;
 }
 
@@ -180,7 +231,9 @@
 }
 
 .postsTitle {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
+
+    color: var(--color-text-primary);
 
     font-size: 1.2rem;
 }
@@ -195,52 +248,66 @@
     padding: 1.5rem;
 
     text-align: center;
-    color: #6b7280;
 
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    color: var(--color-text-muted);
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-sm);
 }
 
 .followsYou {
     width: fit-content;
+
     padding: 0.25rem 0.5rem;
 
     border: none;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
+
+    background: var(--color-surface-hover);
+    color: var(--color-text-secondary);
 
     font-size: 0.8rem;
 
-    background: #f3f4f6;
-    color: #374151;
-
     cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
 }
 
 .followsYou:hover {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--color-error-bg);
+    color: var(--color-error);
 }
 
 .removeFollowerBox {
     position: fixed;
     top: 50%;
     left: 50%;
+    z-index: var(--z-modal);
+
+    width: min(90vw, 380px);
+    padding: 1.5rem;
 
     transform: translate(-50%, -50%);
 
-    width: min(90vw, 380px);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
 
-    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
 
-    background: white;
-    border-radius: 12px;
-
-    z-index: 1000;
+    box-shadow: var(--shadow-lg);
 }
 
 .removeFollowerBox h3 {
     margin-top: 0;
+
+    color: var(--color-text-primary);
 }
 
 .removeFollowerActions {
@@ -255,10 +322,16 @@
     padding: 0.5rem 0.9rem;
 
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 
-    background: #dc2626;
-    color: white;
+    background: var(--color-error);
+    color: var(--color-text-inverse);
 
     cursor: pointer;
+
+    transition: background-color var(--transition-fast);
+}
+
+.removeFollowerButton:hover {
+    background: var(--color-error-hover);
 }

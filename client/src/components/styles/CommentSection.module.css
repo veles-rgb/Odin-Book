@@ -4,15 +4,15 @@
     margin: 1rem auto 0;
     padding: 1rem;
 
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
     border-radius: 16px;
 }
 
 .title {
     margin: 0 0 1rem;
 
-    color: #111827;
+    color: var(--color-text-primary);
     font-size: 1.1rem;
     font-weight: 700;
 }
@@ -26,7 +26,7 @@
 }
 
 .commentForm label {
-    color: #111827;
+    color: var(--color-text-primary);
     font-size: 0.95rem;
     font-weight: 600;
 }
@@ -78,13 +78,13 @@
 .formError {
     min-height: 18px;
 
-    color: #dc2626;
+    color: var(--color-error);
     font-size: 0.9rem;
     font-weight: 500;
 }
 
 .loading,
 .empty {
-    color: #6b7280;
+    color: var(--color-text-muted);
     font-size: 0.95rem;
 }

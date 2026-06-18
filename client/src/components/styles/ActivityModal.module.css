@@ -1,3 +1,5 @@
+@import '../../styles/theme.css';
+
 .activityModal {
     position: absolute;
     top: calc(100% + 0.75rem);
@@ -6,13 +8,12 @@
     width: 420px;
     max-height: 550px;
 
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
     border-radius: 14px;
 
     box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.14),
-        0 4px 12px rgba(0, 0, 0, 0.08);
+        var(--shadow-md);
 
     overflow: hidden;
     z-index: 300;
@@ -33,7 +34,7 @@
 
     font-size: 1.1rem;
     font-weight: 800;
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .closeButton {
@@ -43,18 +44,18 @@
     font-size: 1.5rem;
     line-height: 1;
 
-    color: #6b7280;
+    color: var(--color-text-muted);
     cursor: pointer;
 }
 
 .closeButton:hover {
-    color: #111827;
+    color: var(--color-text-primary);
 }
 
 .tabs {
     display: flex;
     margin-top: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-text-muted);
 }
 
 .tab {
@@ -66,7 +67,7 @@
     padding: 0.85rem;
 
     font-weight: 700;
-    color: #6b7280;
+    color: var(--color-text-muted);
 
     cursor: pointer;
 
@@ -76,13 +77,13 @@
 }
 
 .tab:hover {
-    background: #f9fafb;
-    color: #111827;
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
 }
 
 .activeTab {
-    color: #111827;
-    border-bottom: 2px solid #111827;
+    color: var(--color-text-primary);
+    border-bottom: 2px solid var(--color-primary);
 }
 
 .content {
@@ -95,12 +96,12 @@
 .loading {
     padding: 2rem 1rem;
     text-align: center;
-    color: #6b7280;
+    color: var(--color-text-muted);
 }
 
 .error {
     padding: 1rem;
-    color: #dc2626;
+    color: var(--color-error);
 }
 
 .requestList {
@@ -117,10 +118,10 @@
 
     padding: 0.75rem;
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border);
     border-radius: 12px;
 
-    background: white;
+    background: var(--color-surface);
 }
 
 .requestUser {
@@ -153,7 +154,7 @@
 
 .name {
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text-primary);
 
     white-space: nowrap;
     overflow: hidden;
@@ -162,7 +163,7 @@
 
 .username {
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
 
     white-space: nowrap;
     overflow: hidden;
@@ -188,24 +189,24 @@
 }
 
 .acceptButton {
-    background: #16a34a;
+    background: var(--color-success);
     color: white;
 }
 
 .acceptButton:hover {
-    background: #15803d;
+    background: var(--color-success-hover);
 }
 
 .denyButton,
 .cancelButton {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--color-error-bg);
+    color: var(--color-error);
 }
 
 .denyButton:hover,
 .cancelButton:hover {
-    background: #fecaca;
-    color: #991b1b;
+    background: var(--color-error-bg-hover);
+    color: var(--color-error-hover);
 }
 
 .acceptButton:disabled,

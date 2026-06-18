@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BiLike, BiSolidLike } from 'react-icons/bi';
+
 import { useApiFetch } from '../hooks/useApiFetch';
+import styles from './styles/LikeButton.module.css';
 
 const LikeButton = ({ target, targetId, likedByMe, likeCount }) => {
   const [liked, setLiked] = useState(likedByMe);
@@ -29,14 +31,13 @@ const LikeButton = ({ target, targetId, likedByMe, likeCount }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(data.error || 'Failed to update like.');
         return;
       }
 
       setLiked((prev) => !prev);
       setLikes((prev) => (liked ? prev - 1 : prev + 1));
-      // eslint-disable-next-line no-unused-vars
-    } catch (error) {
+    } catch {
       setError('Something went wrong.');
     } finally {
       setIsLoading(false);
@@ -44,16 +45,17 @@ const LikeButton = ({ target, targetId, likedByMe, likeCount }) => {
   };
 
   return (
-    <button onClick={performAction} disabled={isLoading} className="likeButton">
-      {liked ? (
-        <BiSolidLike style={{ color: 'var(--color-brand)' }} />
-      ) : (
-        <BiLike style={{ color: 'black' }} />
-      )}
-      <span style={{ color: liked ? 'var(--color-brand)' : 'black' }}>
-        {likes}
-      </span>
-      {error && <span>{error}</span>}
+    <button
+      type="button"
+      onClick={performAction}
+      disabled={isLoading}
+      className={`${styles.likeButton} ${liked ? styles.liked : ''}`}
+    >
+      {liked ? <BiSolidLike /> : <BiLike />}
+
+      <span>{likes}</span>
+
+      {error && <span className={styles.error}>{error}</span>}
     </button>
   );
 };

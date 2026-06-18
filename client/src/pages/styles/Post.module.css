@@ -5,9 +5,9 @@
 }
 
 .error {
-    color: #dc2626;
+    color: var(--color-error);
 }
 
 .loading {
-    color: #6b7280;
+    color: var(--color-text-muted);
 }

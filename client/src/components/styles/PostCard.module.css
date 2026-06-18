@@ -1,17 +1,19 @@
 .card {
     width: 100%;
-    background: white;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-
-    padding: 1rem;
+    box-sizing: border-box;
 
     display: flex;
     flex-direction: column;
     gap: 1rem;
 
-    box-sizing: border-box;
+    padding: 1rem;
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-sm);
 }
 
 .header {
@@ -23,11 +25,12 @@
 .avatar {
     width: 48px;
     height: 48px;
-
-    border-radius: 50%;
-    object-fit: cover;
-
     flex-shrink: 0;
+
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+
+    object-fit: cover;
 }
 
 .userInfo {
@@ -36,14 +39,16 @@
 }
 
 .username {
+    color: var(--color-text-secondary);
+
     font-weight: 600;
-    color: #111827;
 }
 
 .dateTimeContainer,
 .timestamp {
+    color: var(--color-text-muted);
+
     font-size: 0.85rem;
-    color: #6b7280;
 }
 
 .dateTimeContainer {
@@ -52,10 +57,10 @@
 }
 
 .content {
+    color: var(--color-text-primary);
+
     font-size: 1rem;
     line-height: 1.5;
-
-    color: #111827;
 
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -68,43 +73,49 @@
 
     padding-top: 0.5rem;
 
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--color-border);
 }
 
 .likeButton,
 .commentsButton {
-    border: none;
-    background: transparent;
-
     display: flex;
     align-items: center;
     gap: 0.5rem;
 
-    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+
+    border: none;
+    border-radius: var(--radius-sm);
+
+    background: transparent;
+    color: var(--color-text-primary);
 
     font-size: 0.95rem;
-    color: #374151;
 
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
+    cursor: pointer;
 
-    transition: background-color 0.15s ease;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
 }
 
 .likeButton:hover,
 .commentsButton:hover {
-    background-color: #f3f4f6;
+    background-color: var(--color-surface-hover);
+    color: var(--color-brand);
 }
 
 .mediaWrapper {
     width: 100%;
+
     margin-top: 0.25rem;
 
     overflow: hidden;
 
-    border-radius: 14px;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
 }
 
 .media {

@@ -8,6 +8,7 @@ import styles from './styles/Navbar.module.css';
 
 import { FaRegBell, FaSearch } from 'react-icons/fa';
 import ActivityModal from './ActivityModal';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const { user } = useAuthContext();
@@ -134,6 +135,8 @@ const Navbar = () => {
               </button>
             </div>
           )}
+
+          <ThemeToggle />
         </nav>
       </div>
     </header>
