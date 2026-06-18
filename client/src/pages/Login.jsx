@@ -26,6 +26,10 @@ const Login = () => {
     await loginUser(data.username, data.password);
   };
 
+  const onGuestLogin = async () => {
+    await loginUser('guest', import.meta.env.VITE_GUEST_PASSWORD);
+  };
+
   return (
     <>
       {isLoading && <IsLoading message="Logging in..." />}
@@ -57,6 +61,13 @@ const Login = () => {
           className="login-submit-button"
         >
           Login
+        </button>
+        <button
+          type="button"
+          onClick={onGuestLogin}
+          style={{ backgroundColor: 'var(--color-brand)' }}
+        >
+          Login as guest
         </button>
         <p>
           Don't have an account?{' '}
