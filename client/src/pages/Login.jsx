@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import { useLogin, guestLogin } from '../hooks/useLogin';
+import { useLogin } from '../hooks/useLogin';
 import IsLoading from '../components/IsLoading';
 
 const schema = yup.object({
