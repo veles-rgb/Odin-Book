@@ -71,7 +71,7 @@ const Feed = () => {
   };
 
   return (
-    <main className={styles.feedPage}>
+    <div className={styles.feedPage}>
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>My Feed</h1>
@@ -147,7 +147,7 @@ const Feed = () => {
           {isLoading ? 'Loading...' : 'Show More'}
         </button>
       )}
-    </main>
+    </div>
   );
 };
 

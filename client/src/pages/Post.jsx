@@ -44,7 +44,7 @@ const Post = () => {
   }, [postId]);
 
   return (
-    <main className={styles.postPage}>
+    <div className={styles.postPage}>
       {error && <div className={styles.error}>{error}</div>}
 
       {isLoading && <div className={styles.loading}>Loading post...</div>}
@@ -59,7 +59,7 @@ const Post = () => {
           showViewPostOption={false}
         />
       )}
-    </main>
+    </div>
   );
 };
 

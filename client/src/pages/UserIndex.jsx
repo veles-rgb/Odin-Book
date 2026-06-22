@@ -51,7 +51,7 @@ const UserIndex = () => {
   }, [searchTerm]);
 
   return (
-    <main className={styles.userIndexMain}>
+    <div className={styles.userIndexMain}>
       <section className={styles.searchCard}>
         <div className={styles.header}>
           <h1 className={styles.title}>Find Users</h1>
@@ -119,7 +119,7 @@ const UserIndex = () => {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

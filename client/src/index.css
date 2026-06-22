@@ -20,6 +20,23 @@ a {
     text-decoration: none;
 }
 
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+
+    background: var(--color-background);
+    color: var(--color-text-primary);
+}
+
+#root {
+    min-height: 100vh;
+}
+
 button,
 input,
 textarea {
@@ -663,4 +680,32 @@ select:disabled {
     background: var(--color-surface);
 
     object-fit: cover;
+}
+
+/* ---------- 
+    FOOTER 
+---------- */
+footer {
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+
+    background: var(--color-header-bg);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-top: 1px solid var(--color-brand);
+}
+
+.footerContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.85rem 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

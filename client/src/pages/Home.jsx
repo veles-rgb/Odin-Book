@@ -71,7 +71,7 @@ const Home = () => {
   };
 
   return (
-    <main className={styles.homePage}>
+    <div className={styles.homePage}>
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Explore</h1>
@@ -143,7 +143,7 @@ const Home = () => {
           {isLoading ? 'Loading...' : 'Show More'}
         </button>
       )}
-    </main>
+    </div>
   );
 };
 

@@ -308,7 +308,7 @@ const Profile = () => {
   };
 
   return (
-    <main className={styles.profileMain}>
+    <div className={styles.profileMain}>
       {isLoading && <div className={styles.loading}>Loading profile...</div>}
 
       {error && <div className={styles.error}>{error}</div>}
@@ -591,7 +591,7 @@ const Profile = () => {
           </section>
         </>
       )}
-    </main>
+    </div>
   );
 };
 

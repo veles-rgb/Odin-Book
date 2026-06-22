@@ -2,7 +2,6 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from './hooks/useAuthContext';
 
-// Pages and Components
 import Navbar from './components/Navbar';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -11,50 +10,58 @@ import Post from './pages/Post';
 import Profile from './pages/Profile';
 import UserIndex from './pages/userIndex';
 import Feed from './pages/Feed';
+import Footer from './components/Footer';
 
 function App() {
   const { user } = useAuthContext();
 
   return (
-    <div className="App">
-      <BrowserRouter>
+    <BrowserRouter>
+      <div className="App">
         <Navbar />
-        <Routes>
-          <Route
-            path="/register"
-            element={user ? <Navigate to={'/'} /> : <Register />}
-          />
-          <Route
-            path="/login"
-            element={user ? <Navigate to={'/'} /> : <Login />}
-          />
 
-          {/* AUTH ROUTES */}
-          <Route
-            path="/"
-            element={user ? <Home /> : <Navigate to={'/login'} />}
-          />
-          <Route
-            path="/post/:postId"
-            element={user ? <Post /> : <Navigate to={'/login'} />}
-          />
-          <Route
-            path="/profile/:identifier"
-            element={user ? <Profile /> : <Navigate to={'/login'} />}
-          />
+        <main className="appMain">
+          <Routes>
+            <Route
+              path="/register"
+              element={user ? <Navigate to="/" /> : <Register />}
+            />
 
-          <Route
-            path="/search"
-            element={user ? <UserIndex /> : <Navigate to={'/login'} />}
-          />
+            <Route
+              path="/login"
+              element={user ? <Navigate to="/" /> : <Login />}
+            />
 
-          <Route
-            path="/feed"
-            element={user ? <Feed /> : <Navigate to={'/login'} />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </div>
+            <Route
+              path="/"
+              element={user ? <Home /> : <Navigate to="/login" />}
+            />
+
+            <Route
+              path="/post/:postId"
+              element={user ? <Post /> : <Navigate to="/login" />}
+            />
+
+            <Route
+              path="/profile/:identifier"
+              element={user ? <Profile /> : <Navigate to="/login" />}
+            />
+
+            <Route
+              path="/search"
+              element={user ? <UserIndex /> : <Navigate to="/login" />}
+            />
+
+            <Route
+              path="/feed"
+              element={user ? <Feed /> : <Navigate to="/login" />}
+            />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
