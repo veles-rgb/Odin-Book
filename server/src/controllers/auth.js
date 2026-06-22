@@ -377,10 +377,50 @@ const changePassword = async (req, res, next) => {
     }
 };
 
+async function guestLogin(req, res, next) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { username: 'guest' },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                error: 'Guest account not found.',
+            });
+        }
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        await saveRefreshToken(user.id, refreshToken);
+
+        res.cookie(
+            'refreshToken',
+            refreshToken,
+            getRefreshCookieOptions()
+        );
+
+        return res.status(200).json({
+            accessToken,
+            user: {
+                id: user.id,
+                username: user.username,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                profile_picture_url: user.profile_picture_url,
+                profile_picture_public_id: user.profile_picture_public_id,
+            },
+        });
+    } catch (error) {
+        return next(error);
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
     createAccessToken,
     logoutUser,
     changePassword,
+    guestLogin
 };

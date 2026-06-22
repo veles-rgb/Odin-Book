@@ -15,6 +15,7 @@ router.post('/register', registerValidation, validate, controller.registerUser);
 router.post('/login', loginValidation, validate, controller.loginUser);
 router.post('/token', controller.createAccessToken);
 router.post('/logout', controller.logoutUser);
+router.post('/guest-login', controller.guestLogin);
 
 router.patch(
     '/password',
