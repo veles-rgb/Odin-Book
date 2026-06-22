@@ -15,22 +15,69 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
     return jwt.sign(
-        { sub: user.id },
+        {
+            sub: user.id,
+        },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "7d" }
+        { expiresIn: '7d' }
     );
+}
+
+function getRefreshCookieOptions() {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    return {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        path: '/api/auth',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+}
+
+function getClearRefreshCookieOptions() {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    return {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        path: '/api/auth',
+    };
+}
+
+async function saveRefreshToken(userId, refreshToken) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await prisma.refreshToken.create({
+        data: {
+            token_hash: hashedRefreshToken,
+            user_id: userId,
+            expires_at: expiresAt,
+        },
+    });
 }
 
 async function registerUser(req, res, next) {
     try {
-        const { first_name, last_name, username, password, profile_picture_url, profile_picture_public_id } = req.body;
+        const {
+            first_name,
+            last_name,
+            username,
+            password,
+            profile_picture_url,
+            profile_picture_public_id,
+        } = req.body;
 
         const trimmedFirst = first_name?.trim();
         const trimmedLast = last_name?.trim();
         const trimmedUsername = username?.trim();
 
         if (!trimmedFirst || !trimmedLast || !trimmedUsername || !password) {
-            return res.status(400).json({ error: 'All fields are required to register' });
+            return res.status(400).json({
+                error: 'All fields are required to register',
+            });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -49,26 +96,13 @@ async function registerUser(req, res, next) {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await saveRefreshToken(user.id, refreshToken);
 
-        await prisma.refreshToken.create({
-            data: {
-                token_hash: hashedRefreshToken,
-                user_id: user.id,
-                expires_at: expiresAt,
-            },
-        });
-
-        const isProduction = process.env.NODE_ENV === "production";
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "none" : "lax",
-            path: "/api/auth",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie(
+            'refreshToken',
+            refreshToken,
+            getRefreshCookieOptions()
+        );
 
         return res.status(201).json({
             accessToken,
@@ -78,13 +112,14 @@ async function registerUser(req, res, next) {
                 first_name: user.first_name,
                 last_name: user.last_name,
                 profile_picture_url: user.profile_picture_url,
-                profile_picture_public_id: user.profile_picture_public_id
-            }
+                profile_picture_public_id: user.profile_picture_public_id,
+            },
         });
-
     } catch (error) {
-        if (error.code === "P2002") {
-            return res.status(409).json({ error: 'Username already taken' });
+        if (error.code === 'P2002') {
+            return res.status(409).json({
+                error: 'Username already taken',
+            });
         }
 
         return next(error);
@@ -96,42 +131,39 @@ async function loginUser(req, res, next) {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res.status(400).json({ error: 'Username and password are required to login' });
+            return res.status(400).json({
+                error: 'Username and password are required to login',
+            });
         }
 
         const user = await prisma.user.findUnique({
             where: { username },
         });
 
-        if (!user) return res.status(401).json({ error: "Invalid credentials" });
+        if (!user) {
+            return res.status(401).json({
+                error: 'Invalid credentials',
+            });
+        }
 
         const ok = await bcrypt.compare(password, user.hashed_password);
 
-        if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+        if (!ok) {
+            return res.status(401).json({
+                error: 'Invalid credentials',
+            });
+        }
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await saveRefreshToken(user.id, refreshToken);
 
-        await prisma.refreshToken.create({
-            data: {
-                token_hash: hashedRefreshToken,
-                user_id: user.id,
-                expires_at: expiresAt,
-            },
-        });
-
-        const isProduction = process.env.NODE_ENV === "production";
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? "none" : "lax",
-            path: "/api/auth",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie(
+            'refreshToken',
+            refreshToken,
+            getRefreshCookieOptions()
+        );
 
         return res.json({
             accessToken,
@@ -140,10 +172,9 @@ async function loginUser(req, res, next) {
                 username: user.username,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                profile_picture_url: user.profile_picture_url
-            }
+                profile_picture_url: user.profile_picture_url,
+            },
         });
-
     } catch (error) {
         return next(error);
     }
@@ -221,8 +252,7 @@ async function createAccessToken(req, res, next) {
             accessToken,
             user,
         });
-
-    } catch (error) {
+    } catch (_error) {
         return res.status(403).json({
             error: 'Invalid refresh token',
         });
@@ -263,21 +293,18 @@ async function logoutUser(req, res, next) {
                     }
                 }
             } catch (_error) {
-
+                // Ignore invalid refresh token during logout.
             }
         }
 
-        res.clearCookie('refreshToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/api/auth',
-        });
+        res.clearCookie(
+            'refreshToken',
+            getClearRefreshCookieOptions()
+        );
 
         return res.status(200).json({
             message: 'Logged out successfully',
         });
-
     } catch (error) {
         return next(error);
     }
@@ -304,11 +331,15 @@ const changePassword = async (req, res, next) => {
         });
 
         if (!user) {
-            return res.status(404).json({ error: 'User not found.' });
+            return res.status(404).json({
+                error: 'User not found.',
+            });
         }
 
         if (user.username === 'guest') {
-            return res.status(400).json({ error: 'You cannot modify the guest account.' });
+            return res.status(400).json({
+                error: 'You cannot modify the guest account.',
+            });
         }
 
         const passwordsMatch = await bcrypt.compare(
@@ -317,7 +348,9 @@ const changePassword = async (req, res, next) => {
         );
 
         if (!passwordsMatch) {
-            return res.status(401).json({ error: 'Current password is incorrect.' });
+            return res.status(401).json({
+                error: 'Current password is incorrect.',
+            });
         }
 
         const samePassword = await bcrypt.compare(
