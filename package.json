@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "cd client && npm install && npm run build && cd ../server && npm install && npx prisma generate",
+    "start": "cd server && node src/app.js"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
