@@ -5,15 +5,11 @@ import styles from './styles/ThemeToggle.module.css';
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
+    return localStorage.getItem('theme') || 'dark';
   });
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
+    document.documentElement.setAttribute('data-theme', theme);
 
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -28,7 +24,7 @@ const ThemeToggle = () => {
       onClick={toggleTheme}
       className={styles.themeButton}
       aria-label="Toggle theme"
-      title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+      title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {theme === 'dark' ? <FiSun /> : <FiMoon />}
     </button>
