@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Post from './pages/Post';
 import Profile from './pages/Profile';
-import UserIndex from './pages/userIndex';
+import UserIndex from './pages/UserIndex';
 import Feed from './pages/Feed';
 import Footer from './components/Footer';
 
