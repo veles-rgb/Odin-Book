@@ -5,11 +5,15 @@ const port = process.env.PORT || 3000;
 const router = require('./routes/index');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const path = require('path');
 
 const allowedOrigins = [
     'http://localhost:5173',
+    'http://localhost:3001',
     'https://vel.up.railway.app',
-];
+    'https://vel-server.up.railway.app',
+    process.env.CLIENT_URL,
+].filter(Boolean);
 
 app.use(
     cors({
@@ -18,16 +22,24 @@ app.use(
                 return callback(null, true);
             }
 
-            return callback(new Error('Not allowed by CORS'));
+            return callback(null, false);
         },
         credentials: true,
-    }),
+    })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api', router);
+
+const clientDistPath = path.join(__dirname, '../../client/dist');
+
+app.use(express.static(clientDistPath));
+
+app.use((req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
