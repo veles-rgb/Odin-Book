@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import { useLogin } from '../hooks/useLogin';
+import { useLogin, guestLogin } from '../hooks/useLogin';
 import IsLoading from '../components/IsLoading';
 
 const schema = yup.object({
@@ -11,7 +11,7 @@ const schema = yup.object({
 });
 
 const Login = () => {
-  const { loginUser, error, isLoading } = useLogin();
+  const { loginUser, guestLogin, error, isLoading } = useLogin();
 
   const {
     register,
@@ -27,7 +27,7 @@ const Login = () => {
   };
 
   const onGuestLogin = async () => {
-    await loginUser('guest', import.meta.env.VITE_GUEST_PASSWORD);
+    await guestLogin();
   };
 
   return (
