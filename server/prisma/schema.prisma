@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AuthAction {
+  LOGIN
+  REGISTER
+  GUEST_LOGIN
+}
+
 model User {
   id                  String   @id @default(uuid()) @db.Uuid
   first_name          String   @db.VarChar(20)
@@ -23,6 +29,7 @@ model User {
   comments      Comment[]
   postLikes     postLike[]
   commentLikes  commentLike[]
+  loginIps      AuthLog[]
 
   followers Follow[] @relation("UserFollowers")
   following Follow[] @relation("UserFollowing")
@@ -122,4 +129,20 @@ model Follow {
   following User @relation("UserFollowers", fields: [following_id], references: [id], onDelete: Cascade)
 
   @@unique([follower_id, following_id])
+}
+
+model AuthLog {
+  id         String     @id @default(uuid()) @db.Uuid
+  user_id    String     @db.Uuid
+  ip_address String
+  user_agent String?
+  action     AuthAction
+  created_at DateTime   @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([ip_address])
+  @@index([action])
+  @@index([created_at])
 }
