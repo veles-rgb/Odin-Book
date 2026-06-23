@@ -409,6 +409,11 @@ async function guestLogin(req, res, next) {
 
         await saveRefreshToken(user.id, refreshToken);
 
+        console.log('req.ip:', req.ip);
+        console.log('req.ips:', req.ips);
+        console.log('x-forwarded-for:', req.headers['x-forwarded-for']);
+        console.log('remoteAddress:', req.socket.remoteAddress);
+
         await createAuthLog(user.id, req, 'GUEST_LOGIN');
 
         res.cookie(
