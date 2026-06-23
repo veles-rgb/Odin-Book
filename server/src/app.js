@@ -6,7 +6,7 @@ const router = require('./routes/index');
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require('path');
-const checkIpBan = require('./src/middleware/checkIpBan');
+const checkIpBan = require('./middleware/checkIpBan');
 
 const allowedOrigins = [
     'http://localhost:5173',
