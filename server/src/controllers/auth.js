@@ -3,6 +3,17 @@ const jwt = require('jsonwebtoken');
 
 const { prisma } = require('../../lib/prisma.mjs');
 
+async function createAuthLog(userId, req, action) {
+    await prisma.authLog.create({
+        data: {
+            user_id: userId,
+            ip_address: req.ip,
+            user_agent: req.get('user-agent') || null,
+            action,
+        },
+    });
+}
+
 function generateAccessToken(user) {
     return jwt.sign(
         {
@@ -94,6 +105,8 @@ async function registerUser(req, res, next) {
 
         await saveRefreshToken(user.id, refreshToken);
 
+        await createAuthLog(user.id, req, 'REGISTER');
+
         res.cookie(
             'refreshToken',
             refreshToken,
@@ -154,6 +167,8 @@ async function loginUser(req, res, next) {
         const refreshToken = generateRefreshToken(user);
 
         await saveRefreshToken(user.id, refreshToken);
+
+        await createAuthLog(user.id, req, 'LOGIN');
 
         res.cookie(
             'refreshToken',
@@ -393,6 +408,8 @@ async function guestLogin(req, res, next) {
         const refreshToken = generateRefreshToken(user);
 
         await saveRefreshToken(user.id, refreshToken);
+
+        await createAuthLog(user.id, req, 'GUEST_LOGIN');
 
         res.cookie(
             'refreshToken',
