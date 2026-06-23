@@ -165,6 +165,12 @@ async function loginUser(req, res, next) {
             });
         }
 
+        if (user.is_banned) {
+            return res.status(403).json({
+                error: 'This account has been banned.',
+            });
+        }
+
         const ok = await bcrypt.compare(password, user.hashed_password);
 
         if (!ok) {

@@ -31,6 +31,8 @@ model User {
   commentLikes  commentLike[]
   loginIps      AuthLog[]
 
+  is_banned     Boolean  @default(false)
+
   followers Follow[] @relation("UserFollowers")
   following Follow[] @relation("UserFollowing")
 
@@ -145,4 +147,13 @@ model AuthLog {
   @@index([ip_address])
   @@index([action])
   @@index([created_at])
+}
+
+model IpBan {
+  id         String   @id @default(uuid()) @db.Uuid
+  ip_address String   @unique
+  reason     String?
+  created_at DateTime @default(now())
+
+  @@index([ip_address])
 }
