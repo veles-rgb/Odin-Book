@@ -3,11 +3,21 @@ const jwt = require('jsonwebtoken');
 
 const { prisma } = require('../../lib/prisma.mjs');
 
+function getClientIp(req) {
+    const xRealIp = req.headers['x-real-ip'];
+
+    if (xRealIp) {
+        return xRealIp.replace(/^::ffff:/, '');
+    }
+
+    return req.ip?.replace(/^::ffff:/, '') || null;
+}
+
 async function createAuthLog(userId, req, action) {
     await prisma.authLog.create({
         data: {
             user_id: userId,
-            ip_address: req.ip,
+            ip_address: getClientIp(req),
             user_agent: req.get('user-agent') || null,
             action,
         },
@@ -408,11 +418,6 @@ async function guestLogin(req, res, next) {
         const refreshToken = generateRefreshToken(user);
 
         await saveRefreshToken(user.id, refreshToken);
-
-        console.log('req.ip:', req.ip);
-        console.log('req.ips:', req.ips);
-        console.log('x-forwarded-for:', req.headers['x-forwarded-for']);
-        console.log('remoteAddress:', req.socket.remoteAddress);
 
         await createAuthLog(user.id, req, 'GUEST_LOGIN');
 
